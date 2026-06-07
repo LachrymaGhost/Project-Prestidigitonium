@@ -1,6 +1,6 @@
 ---
 name: adoption-guide
-version: 0.2.1
+version: 0.2.2
 status: draft
 license: Apache-2.0
 maintained_by: Aire System Architect (ASA)
@@ -22,7 +22,7 @@ The guide assumes you have:
 
 The guide does **not** assume a multi-role project, sprint discipline, existing audit history, or pre-existing failure-pattern documentation. The pattern adopts cleanly into a single-role project from scratch.
 
-## Adoption in seven steps
+## Adoption in nine steps
 
 ### Step 1 — Identify the audited role and its verification structure
 
@@ -111,7 +111,7 @@ For each per-criterion audit interpretation, author:
 - **Refutation mechanism.** Concrete enough that two independent auditors would converge.
 - **Audit fail conditions.** When the refutation succeeds.
 
-### Step 7 — Add reciprocal pointer to the audited role file, bump versions, surface
+### Step 7 — Add reciprocal pointer to the audited role file, bump versions
 
 Edit the audited role's frontmatter to add: `audited_by: <audited-role-slug>-auditor.role.md`. This is the only required edit to the audited role file under v0.2.0. (Optional: scrub any deprecated language, update governance references — but those are independent housekeeping, not adoption requirements.)
 
@@ -120,10 +120,28 @@ Bump the audited role's version per the project's versioning conventions (minor 
 Update both files' Provenance subsections with summaries noting:
 - The new auditor file's existence.
 - Reciprocal pointer added to the audited role.
-- Conformance with `auditor-pattern-spec.md` v0.2.0.
+- Conformance with `auditor-pattern-spec.md` v0.2.0+.
 - The asymmetric corpus location.
 
-Surface the change to maintainers and to whoever runs audit passes. The pattern is operational the moment the auditor file lands and the corpus tree exists.
+### Step 8 — Wire project-harness routing so auditor instances actually bind to the auditor file
+
+This step exists because the previous seven could all be completed correctly — every file conformant, every pointer reciprocal, every criterion passed — and the adoption could still sit inert. Project harnesses (CLAUDE.md anchor protocols, role-invocation conventions, IDE integration shims) typically hardcode which role file gets loaded at session start. If that hardcoded path always loads the audited role's file, then auditor invocations will silently anchor to the builder's content, never load the auditor's own role file, and produce no audits — while looking fully conformant on inspection.
+
+None of the nineteen conformance criteria catch this failure because the criteria evaluate file-level conformance, not project-harness routing. Routing is project-environment configuration, not a pattern-level concern; but the obligation to update it is part of adoption.
+
+**Update the project's session-start / anchor routing** so that auditor invocations load `<audited-role-slug>-auditor.role.md` rather than the audited role's file. Use one of the three strategies documented in §"Project CLAUDE.md routing under separate-file architecture" below:
+
+- **Strategy A (recommended)** — separate CLAUDE.md per role/auditor directory.
+- **Strategy B** — single CLAUDE.md with explicit instance dispatch.
+- **Strategy C** — auditor invocation bypasses CLAUDE.md auto-load.
+
+Document the chosen strategy in the auditor file's Provenance and in the project's CLAUDE.md(s) so downstream readers understand the bootstrap topology.
+
+**Smoke test**: invoke the auditor; confirm the auditor's role file (not the audited role's) was the session anchor. If the auditor instance loads the audited role file at session start, Step 8 is incomplete regardless of how clean Steps 1–7 are. This is the most common silent adoption failure under v0.2.0 and is invisible to conformance review of the files alone.
+
+### Step 9 — Surface
+
+Notify maintainers and audit-pass operators. The pattern is operational the moment Steps 1–8 are complete and the corpus tree exists.
 
 ## What changes for the audited role's builder
 
@@ -160,7 +178,7 @@ Everything that wasn't already there. The auditor:
 
 - **Empty corpus omitted entirely.** Skipping the corpus when there are no entries to put in it. The directory tree must exist (with INDEX files) even when empty.
 
-- **Loading the auditor role file into builder context.** The asymmetry is what produces independence. Loading the auditor file in the builder's session-start eliminates the mechanism. Conformance criterion C-14 fails.
+- **Loading the auditor role file into builder context.** The asymmetry is what produces independence. Loading the auditor file in the builder's session-start eliminates the mechanism. Conformance criterion C-16 fails.
 
 - **Conflating builder rules with audit rules.** The audited role's rules live in the audited role's file. The auditor's rules live in the auditor's file. They are different rules. The auditor's Operating Rules govern *how to audit*; the audited role's Operating Rules govern *how to do the work*.
 
@@ -293,9 +311,14 @@ A compact form for use during adoption:
   - [ ] All six relational primitives.
   - [ ] Escalation & Halt Conditions.
   - [ ] Change Control + Provenance.
-- [ ] Step 7 — Audited role file edited: `audited_by:` frontmatter pointer added; version bumped; provenance updated. Maintainers notified.
+- [ ] Step 7 — Audited role file edited: `audited_by:` frontmatter pointer added; version bumped; provenance updated.
+- [ ] Step 8 — Project-harness routing wired:
+  - [ ] Routing strategy chosen (A / B / C from §"Project CLAUDE.md routing").
+  - [ ] Strategy documented in auditor file's Provenance + project CLAUDE.md.
+  - [ ] Smoke test passed: auditor invocation confirmed to load the auditor's role file at session start, NOT the audited role's file.
+- [ ] Step 9 — Maintainers + audit-pass operators notified.
 
-When the checklist is complete, the adoption is conformant with `auditor-pattern-spec.md` v0.2.0 at v0.1.0-empty corpus state. Conformance verification details live in `conformance-criteria.md`.
+When the checklist is complete, the adoption is conformant with `auditor-pattern-spec.md` v0.2.0+ at v0.1.0-empty corpus state. Conformance verification details live in `conformance-criteria.md`.
 
 # Change Control
 
@@ -304,4 +327,4 @@ Update version and provenance on every change.
 ## Provenance
 - source: Major revision per architectural inversion from same-file (v0.1.x) to separate-file (v0.2.0).
 - time: 2026-06-07
-- summary: v0.2.0 — Rewritten seven-step adoption walkthrough for v0.2.0 separate-file architecture. Steps now create a new auditor role file rather than add a §Audit-Variant section to the audited role file. New step 7 adds the reciprocal `audited_by:` frontmatter pointer to the audited role file (the only required edit to that file under v0.2.0). What-changes-for-builder section simplified (builder behavior virtually unchanged; new frontmatter field is informational). What-changes-for-auditor section expanded (auditor is now a full role file with its own Operating Rules, Verification, Inputs). New "Migration from v0.1.x" section walks v0.1.x adopters through extracting their §Audit-Variant sections into separate auditor files. Failure modes updated with v0.2.0-specific cases (frontmatter pointer omissions, auditor-file-loaded-by-builder). Companion to auditor-pattern-spec.md v0.2.0 and template-auditor-role-file.md v0.2.0. v0.2.1 (2026-06-07) — Adds new "Project CLAUDE.md routing under separate-file architecture" section per Sketch Main Auditor's observation that hardcoded CLAUDE.md references to the audited role file's content contaminate the auditor's cold-context posture at boot under v0.2.0. Three routing strategies documented: Strategy A — separate CLAUDE.md per role/auditor directory (recommended; mirrors file-boundary asymmetry at directory level); Strategy B — single CLAUDE.md with explicit instance dispatch (acceptable when invocation context is naturally explicit); Strategy C — auditor invocation bypasses CLAUDE.md auto-load (only viable when runtime supports it). All three satisfy Criterion C-16 when implemented correctly; the pattern spec does not mandate a strategy. Recommendation: Strategy A for new adoptions; Strategy A for migrations where feasible (B as defensible interim).
+- summary: v0.2.0 — Rewritten seven-step adoption walkthrough for v0.2.0 separate-file architecture. Steps now create a new auditor role file rather than add a §Audit-Variant section to the audited role file. New step 7 adds the reciprocal `audited_by:` frontmatter pointer to the audited role file (the only required edit to that file under v0.2.0). What-changes-for-builder section simplified (builder behavior virtually unchanged; new frontmatter field is informational). What-changes-for-auditor section expanded (auditor is now a full role file with its own Operating Rules, Verification, Inputs). New "Migration from v0.1.x" section walks v0.1.x adopters through extracting their §Audit-Variant sections into separate auditor files. Failure modes updated with v0.2.0-specific cases (frontmatter pointer omissions, auditor-file-loaded-by-builder). Companion to auditor-pattern-spec.md v0.2.0 and template-auditor-role-file.md v0.2.0. v0.2.1 (2026-06-07) — Adds new "Project CLAUDE.md routing under separate-file architecture" section per Sketch Main Auditor's observation that hardcoded CLAUDE.md references to the audited role file's content contaminate the auditor's cold-context posture at boot under v0.2.0. Three routing strategies documented: Strategy A — separate CLAUDE.md per role/auditor directory (recommended; mirrors file-boundary asymmetry at directory level); Strategy B — single CLAUDE.md with explicit instance dispatch (acceptable when invocation context is naturally explicit); Strategy C — auditor invocation bypasses CLAUDE.md auto-load (only viable when runtime supports it). All three satisfy Criterion C-16 when implemented correctly; the pattern spec does not mandate a strategy. Recommendation: Strategy A for new adoptions; Strategy A for migrations where feasible (B as defensible interim). v0.2.2 (2026-06-07) — Per Sketch Main Auditor's v0.2.0 review: (E1) corrects the wrong-criterion reference in the failure-modes list (was C-14, should be C-16 — the load-list discipline criterion). Adds new Step 8 "Wire project-harness routing so auditor instances actually bind to the auditor file" addressing the gap the auditor flagged as Q1 — a fully conformant adoption could sit inert if the project harness keeps routing auditor invocations to the audited role's file; none of the nineteen criteria catch this failure because routing is project-environment configuration. Step 8 names the obligation, references the three routing strategies, and requires a smoke test (invoke the auditor; confirm correct session anchor). Old "Surface" content split out as Step 9. Adoption checklist extended with Step 8 (strategy chosen + documented + smoke-test passed) and Step 9. Total step count: nine.

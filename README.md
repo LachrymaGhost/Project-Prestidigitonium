@@ -14,7 +14,7 @@ The pattern is designed to drop into existing role-based systems by way of a **s
 | `template-auditor-role-file.md` | Copy-pasteable skeleton for the separate auditor role file, with annotated guidance on frontmatter, naming, key-check categories, per-criterion clauses, and cross-rule obligations. |
 | `audit-corpus-spec.md` | Structure, growth rules, and access discipline for the asymmetric corpus — the body of materials the auditor loads but the audited role does not. Includes active-learning hooks (forward-compatible v0.1.1 + v0.2.0 location update). |
 | `adoption-guide.md` | Seven-step walkthrough from "role file with rules" to "conformant auditor role file alongside it." Includes a Migration from v0.1.x section for adopters of the same-file pattern. |
-| `conformance-criteria.md` | Nineteen criteria (seventeen Required, two Recommended) for verifying that an implementation realizes the pattern. Includes verdict structure and review procedure. |
+| `conformance-criteria.md` | Twenty criteria (seventeen Required, three Recommended) for verifying that an implementation realizes the pattern. Includes verdict structure and review procedure. |
 | `CHANGELOG.md` | Version history. |
 | `LICENSE` | Apache 2.0. |
 
@@ -77,7 +77,7 @@ Nothing executes. No new infrastructure spins up. The pattern is operational the
 
 ## Status and stability
 
-This is **v0.2.1**, status **draft**. The architectural revision from v0.1.x to v0.2.0 was a major inversion. v0.2.1 adds an explicit supersession of v0.1.x's "no separate file" architectural language and a new CLAUDE.md routing section in the adoption guide (three strategies; Strategy A — separate CLAUDE.md per role/auditor directory — recommended). The pattern is internally consistent and operationally complete — it can be adopted now — but corpus-population conventions will sharpen as real instances accumulate findings and post-mortems.
+This is **v0.2.2**, status **draft**. The architectural revision from v0.1.x to v0.2.0 was a breaking inversion under the 0.x convention. v0.2.1 added explicit supersession of v0.1.x architectural language and the CLAUDE.md routing section in the adoption guide. v0.2.2 absorbed Sketch Main Auditor's review of v0.2.0: five errata fixed (cross-criterion reference, stale frontmatter, stale §Audit-Variant body refs, internal contradiction, semver-language inconsistency); new Step 8 in the adoption guide closes the auditor-routing-binding gap; new `audit_posture` declaration mechanism (artifact-verdict-only / continuous-monitoring / hybrid) clarifies that the cold-context discipline scopes to artifact verdicts only and is compatible with continuous-monitoring auditor functions. The pattern is internally consistent and operationally complete — it can be adopted now — but corpus-population conventions will sharpen as real instances accumulate findings and post-mortems.
 
 Versioning policy is in `auditor-pattern-spec.md` §"Versioning."
 
@@ -90,7 +90,7 @@ Production adopters: pin to the commit hash you adopted against. v0.x.y is pre-s
 
 ## Roadmap (informal)
 
-- **v0.2.x** — clarifications, examples, additional drift-catalog templates, real-corpus learnings as they accumulate. *v0.2.1 (current): v0.1.x supersession language + CLAUDE.md routing section.*
+- **v0.2.x** — clarifications, examples, additional drift-catalog templates, real-corpus learnings as they accumulate. *v0.2.1: v0.1.x supersession language + CLAUDE.md routing section. v0.2.2 (current): Sketch Main Auditor review — 5 errata + Step 8 routing-binding obligation + `audit_posture` declaration mechanism + C-20 Recommended.*
 - **v0.3.0** — likely additions: project-level multi-role corpus sharing conventions; explicit cross-corpus pollination protocol; conformance criteria for the specifications themselves (self-conformance, currently reserved).
 - **v1.0.0** — declared when at least two independent projects have run the pattern in production for three months and the spec's evolution has stabilized.
 

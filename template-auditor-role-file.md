@@ -1,6 +1,6 @@
 ---
 name: template-auditor-role-file
-version: 0.2.0
+version: 0.2.2
 status: draft
 license: Apache-2.0
 maintained_by: Aire System Architect (ASA)
@@ -29,12 +29,23 @@ domain_tags: [system, audit, governance]
 status: draft
 license: Apache-2.0
 audits: <audited-role-slug>.role.md
-follows_pattern: Project Prestidigitonium v0.2.0
+follows_pattern: Project Prestidigitonium v0.2.2
+audit_posture: <one of: artifact-verdict-only | continuous-monitoring | hybrid>
 ---
 
 # Purpose
 
-Audit role specifications produced by **<Audited Role Name>** (`<audited-role-slug>.role.md`) for conformance with <project's upstream governance> and for conformance with the Project Prestidigitonium auditor pattern when claimed. This role exists as a separate file from <Audited Role Name> itself, by design, so that the auditor's reasoning is not bound to the same text as the role being audited; the audited role file is declared as an Input rather than as the source of audit authority. Authority bottoms out in upstream governance and in the audited role's *outputs*, not in <Audited Role Name>'s own rules.
+Audit <the audited role's output type — e.g., role specifications, generated code, rendered artifacts, written documentation, sprint outcomes> produced by **<Audited Role Name>** (`<audited-role-slug>.role.md`) for conformance with <project's upstream governance> and for conformance with the Project Prestidigitonium auditor pattern when claimed. This role exists as a separate file from <Audited Role Name> itself, by design, so that the auditor's reasoning is not bound to the same text as the role being audited; the audited role file is declared as an Input rather than as the source of audit authority. Authority bottoms out in upstream governance and in the audited role's *outputs*, not in <Audited Role Name>'s own rules.
+
+## Audit posture declaration
+
+This auditor's `audit_posture` is **<chosen value>**. The three valid postures and their implications:
+
+- **`artifact-verdict-only`** — auditor reads artifacts fresh, no narrative loading, no ongoing session monitoring. Verdicts are issued against a presented artifact and the auditor stops. Use for role-file audits, document audits, code-review-style audits where the artifact is bounded and the audit is episodic. The cold-context discipline (see Operational Constraints) applies in full.
+- **`continuous-monitoring`** — auditor runs as an ongoing accountability partner: comms polling, session monitoring, memory state captures, real-time HALT firing. Verdicts may be issued mid-session and revised as conditions evolve. Use for execution-heavy roles where defects compound across iterations and post-hoc audit comes too late. The cold-context discipline applies *only to artifact verdicts* (see Operational Constraints); monitoring duties are explicitly compatible.
+- **`hybrid`** — auditor performs both functions: continuous monitoring during active sessions and artifact-verdict audits at session boundaries or on demand. Use when the audited role has both ongoing-work and discrete-artifact characteristics. The cold-context discipline scopes to artifact verdicts; monitoring functions retain narrative loading.
+
+The chosen posture MUST be stated explicitly in the `audit_posture` frontmatter field AND named in this section. Auditors that fail to declare a posture default to `artifact-verdict-only`, which is the most restrictive option; adopters of other postures must declare them explicitly.
 
 # Scope
 
@@ -73,8 +84,11 @@ Reinforcement (MUSTs):
 - Output: audit verdict (one of `CONFORMANT`, `CONFORMANT WITH NOTES`, `PARTIALLY CONFORMANT`, `NON-CONFORMANT`) plus structured findings.
 - Output destination: <where the audit output goes — response, file, comms outbox>.
 - Safety: governance references treated as immutable unless the user provides an approved update path.
-- Session-start load discipline: load this role file, the audited role file, upstream governance specs, the asymmetric corpus active entries, current project state. Do NOT load auto-memory beyond what governance specifies.
-- Cold-context note: encompassment requires domain fluency (auditor reads the audited role file and governance), but the auditor does NOT load the audited role's session-by-session work history. The artifact is read fresh; the narrative of its authoring is not.
+- Session-start load discipline: load this role file, the audited role file, upstream governance specs, the asymmetric corpus active entries, current project state. Do NOT load auto-memory beyond what governance specifies AND beyond what this auditor's `audit_posture` permits.
+- **Cold-context discipline (scoped to artifact verdicts).** Encompassment requires domain fluency (auditor reads the audited role file and governance), but for the purpose of issuing a **verdict on a specific artifact**, the auditor does NOT load the audited role's session-by-session work history. The artifact is read fresh; the narrative of its authoring is not used to pre-frame the verdict. This discipline applies *to the verdict step only*. It does not forbid the broader auditor function from monitoring sessions, polling comms, or maintaining state captures when the auditor's declared `audit_posture` is `continuous-monitoring` or `hybrid` — those functions are explicitly compatible with the cold-context discipline, because they operate on different inputs (live session state, comms, monitoring signals) than the artifact-verdict step (the bounded artifact under review).
+- **For `artifact-verdict-only` posture:** the cold-context discipline applies to all auditor reads. No session monitoring, no narrative loading, no auto-memory beyond governance. The auditor's entire function is artifact verdicts.
+- **For `continuous-monitoring` posture:** the cold-context discipline applies only when the auditor produces a discrete artifact verdict. Monitoring, polling, and state-capture functions load whatever the auditor's standing directives prescribe.
+- **For `hybrid` posture:** monitoring functions load per standing directives; artifact-verdict steps load only what the cold-context discipline permits. The auditor switches modes explicitly per task.
 
 # Inputs
 
@@ -264,4 +278,4 @@ Update version and provenance on every change.
 ## Provenance
 - source: Replacement of v0.1.x template-audit-variant-section.md per architectural revision to separate-file pattern.
 - time: 2026-06-07
-- summary: v0.2.0 — Initial template for separate-file auditor role files. Provides copy-pasteable skeleton with placeholder tokens spanning frontmatter (with required `audits:` and `follows_pattern:` fields), all standard role-file sections (Purpose, Scope, Normative Requirements, Operational Constraints, Inputs, Outputs, Verification, Operating Rules, Verification of audited role files, Cross-rule audit obligations, Relational Implementation, Escalation & Halt, Change Control), plus annotated guidance on frontmatter, naming, key-check category selection, per-criterion clause structure, and cross-rule obligations. Replaces v0.1.x's `template-audit-variant-section.md`, which provided only a section skeleton rather than a full role file.
+- summary: v0.2.0 — Initial template for separate-file auditor role files. Provides copy-pasteable skeleton with placeholder tokens spanning frontmatter (with required `audits:` and `follows_pattern:` fields), all standard role-file sections (Purpose, Scope, Normative Requirements, Operational Constraints, Inputs, Outputs, Verification, Operating Rules, Verification of audited role files, Cross-rule audit obligations, Relational Implementation, Escalation & Halt, Change Control), plus annotated guidance on frontmatter, naming, key-check category selection, per-criterion clause structure, and cross-rule obligations. Replaces v0.1.x's `template-audit-variant-section.md`, which provided only a section skeleton rather than a full role file. v0.2.2 (2026-06-07) — Per Sketch Main Auditor's v0.2.0 review (Q2): the cold-context discipline as originally written ("auditor does NOT load the audited role's session-by-session work history" + "do NOT load auto-memory beyond what governance specifies") was correctly scoped to *artifact-verdict audits* but read as forbidding monitoring functions wholesale, which would contradict standing directives for continuous-monitoring auditors (Sketch Main Auditor being the worked example). Three changes resolve the ambiguity: (1) new `audit_posture` frontmatter field with three valid values (`artifact-verdict-only`, `continuous-monitoring`, `hybrid`); (2) new "Audit posture declaration" section in the body requiring adopters to name their posture explicitly with default of `artifact-verdict-only`; (3) Operational Constraints cold-context clause clarified to scope strictly to the artifact-verdict step — monitoring functions are explicitly compatible with `continuous-monitoring` and `hybrid` postures because they operate on different inputs (live session state, comms, monitoring signals) than the artifact-verdict step. Additionally, Purpose skeleton generalized: the previous "Audit role specifications" opening assumed role-file audits; replaced with `<audited role's output type>` slot so the template honestly generalizes to renders, code, tests, sprint outcomes, and other artifact classes. No conformance-criteria changes from v0.2.0; v0.2.0-conformant implementations remain conformant under v0.2.2 (adopters who target v0.2.2+ should add the `audit_posture` declaration; absence defaults to the most restrictive option).

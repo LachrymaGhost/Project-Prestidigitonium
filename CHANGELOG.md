@@ -2,6 +2,28 @@
 
 All notable changes to Project Prestidigitonium are documented here. Versioning follows semantic versioning per `auditor-pattern-spec.md` §"Versioning."
 
+## [0.2.2] — 2026-06-07
+
+### Origin
+All items in this release originate from Sketch Main Auditor's review of v0.2.0 at commit `d436e33`. Five errata (E1–E5) plus two design questions (Q1, Q2) — all incorporated. v0.2.0 implementations remain conformant under v0.2.2; no Required conformance criteria added or invalidated.
+
+### Fixed (errata)
+- **E1 — Wrong criterion reference in adoption-guide.md failure-modes list.** Cited C-14 (relational primitives) where C-16 (load-list discipline) was meant. Corrected.
+- **E2 — Stale frontmatter `references:` field in audit-corpus-spec.md.** Still pinned at `auditor-pattern-spec.md v0.1.0` after the v0.2.0 body update. Now points at v0.2.2.
+- **E3 — Three stale §Audit-Variant references in audit-corpus-spec.md body.** Disk-layout diagram, status-field explanation, and post-mortem incorporation rule each carried v0.1.x language that the v0.2.0 pass missed. Scrubbed; all three now correctly reference the auditor role file's audit interpretations / cross-rule obligations.
+- **E4 — Internal contradiction between audit-corpus-spec.md and conformance-criteria.md C-15.** Spec said Category D directory contains "no files"; C-15 said it contains an explanatory README. Reconciled with the C-15 version (README present); empty directory wouldn't survive git anyway.
+- **E5 — Semver-language contradiction in auditor-pattern-spec.md.** Defined Major as `x+1.0.0` then labeled 0.1.1→0.2.0 a "major architectural revision" / "major version bump." Defensible under 0.x convention but the labels contradicted the scheme. Corrected to "breaking revision under the 0.x convention."
+
+### Added (design questions)
+- **Q1 — Step 8 (and Step 9 split) in adoption-guide.md.** New "Wire project-harness routing so auditor instances actually bind to the auditor file" step closes the gap where a fully conformant adoption could sit inert because the project harness keeps routing auditor invocations to the audited role's file. None of the nineteen conformance criteria catch this failure because routing is project-environment configuration. Step 8 names the obligation explicitly, references the three routing strategies (added in v0.2.1), and requires a smoke test. Total step count: nine.
+- **Q2 — Cold-context posture clarification + `audit_posture` declaration mechanism + Purpose-skeleton generalization in template-auditor-role-file.md.** The original cold-context clause was correctly scoped to artifact-verdict audits but read as forbidding monitoring functions wholesale, which would contradict standing directives for continuous-monitoring auditors. Three changes resolve the ambiguity: new `audit_posture` frontmatter field with three valid values (`artifact-verdict-only`, `continuous-monitoring`, `hybrid`); new "Audit posture declaration" body section requiring explicit declaration with graceful default to `artifact-verdict-only`; Operational Constraints cold-context clause clarified to scope strictly to the artifact-verdict step (monitoring functions explicitly compatible with `continuous-monitoring` / `hybrid` postures). Purpose skeleton also generalized: previous "Audit role specifications" opening assumed role-file audits; replaced with `<audited role's output type>` slot.
+- **Criterion C-20 (Recommended) in conformance-criteria.md.** Verifies `audit_posture` declaration is explicit (frontmatter + body match). Recommended (not Required) because v0.2.2's template specifies a graceful default; explicit declaration prevents downstream ambiguity but absence is operationally tolerable.
+
+### References updated
+- `audit-corpus-spec.md` frontmatter `references:` → `auditor-pattern-spec.md v0.2.2`
+- `conformance-criteria.md` frontmatter `references:` → `auditor-pattern-spec.md v0.2.2, template-auditor-role-file.md v0.2.2, audit-corpus-spec.md v0.2.2`
+- `template-auditor-role-file.md` skeleton frontmatter `follows_pattern:` → `Project Prestidigitonium v0.2.2`
+
 ## [0.2.1] — 2026-06-07
 
 ### Added

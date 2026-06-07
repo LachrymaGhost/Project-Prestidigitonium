@@ -1,11 +1,11 @@
 ---
 name: audit-corpus-spec
-version: 0.2.0
+version: 0.2.2
 status: draft
 license: Apache-2.0
 maintained_by: Aire System Architect (ASA)
 domain_tags: [governance, corpus, audit, asymmetric-knowledge]
-references: auditor-pattern-spec.md v0.1.0
+references: auditor-pattern-spec.md v0.2.2
 ---
 
 # Audit Corpus Specification
@@ -86,13 +86,13 @@ audit-corpus/
 │   ├── <pattern-name>.md               — one pattern per file
 │   └── …
 ├── D-self-referential/
-│   └── (no files — Category D lives in the role file's §Audit-Variant section)
+│   └── README.md                       — explanatory pointer to the auditor role file (per Conformance Criterion C-15)
 └── E-project-specific/
     ├── INDEX.md
     └── …
 ```
 
-Category D's directory exists for symmetry and to document the inclusion explicitly; it intentionally contains no files because the materials live in the auditor role file (`<audited-role-slug>-auditor.role.md`).
+Category D's directory exists for symmetry and contains a `README.md` (per Conformance Criterion C-15) that explains the inclusion explicitly and points to the auditor role file (`<audited-role-slug>-auditor.role.md`) where the actual Category D materials live (Operating Rules, audit interpretations, cross-rule obligations). The directory does not contain category entries itself; the README is navigational, ensuring the directory survives version control and remains discoverable.
 
 INDEX files are maintained per the project's existing index conventions (typically markdown tables, sorted by date or by rule). Indexes are NOT canonical — they are navigation aids — and may be regenerated from frontmatter.
 
@@ -117,7 +117,7 @@ tags: [<tag>, …]
 
 The `informed` field is the load-bearing forward-link for active-learning hooks (see §"Active-learning hooks" below). A Category A finding that contributed to a Category C drift catalog entry carries `informed: [C-<pattern-id>]`; programmatic analysis of `informed` linkages reveals which findings clustered into which patterns and where governance evolution traces back to specific evidence.
 
-The `status` field is the load-time signal: an auditor loading the corpus reads `active` entries normatively, `superseded` and `retracted` entries as historical context (visible but not authoritative), `incorporated` entries as resolved (the post-mortem's lesson is now in the §Audit-Variant clauses; the entry stays for traceability).
+The `status` field is the load-time signal: an auditor loading the corpus reads `active` entries normatively, `superseded` and `retracted` entries as historical context (visible but not authoritative), `incorporated` entries as resolved (the post-mortem's lesson is now in the auditor role file's audit interpretations or cross-rule obligations; the entry stays for traceability).
 
 ## Growth rules
 
@@ -141,7 +141,7 @@ Retraction is the failure lifecycle: an entry determined to be incorrect (the "d
 
 ### When entries get incorporated
 
-Post-mortem entries with `status: accepted` should drive concrete changes to the §Audit-Variant clauses or cross-rule obligations. When the change lands, the post-mortem's status flips to `incorporated`. This is the corpus's feedback loop into the role file.
+Post-mortem entries with `status: accepted` should drive concrete changes to the auditor role file's audit interpretations or cross-rule obligations. When the change lands, the post-mortem's status flips to `incorporated`. This is the corpus's feedback loop into the auditor role file.
 
 Findings entries can drive Drift catalog entries (Category A → Category C). When three or more findings name the same pattern, the auditor (or a maintainer) authors a Category C entry capturing the pattern, and the contributing Category A entries link forward via `informed: [C-pattern-id]`.
 
@@ -241,4 +241,4 @@ Update version and provenance on every change.
 ## Provenance
 - source: Initial draft.
 - time: 2026-06-07
-- summary: v0.1.0 — Initial specification of the audit corpus. Defines five entry categories (prior findings, failure post-mortems, drift catalogs, self-referential §Audit-Variant clauses, project-specific materials), default disk layout, entry frontmatter schema, growth rules (entry, supersession, incorporation), access discipline (asymmetric load, visible but not eager-loaded by builder), bootstrapping guidance for v0.1.0-empty corpora, and anti-pattern catalog. Operationalizes Mechanism 2 of auditor-pattern-spec.md v0.1.0. v0.1.1 (2026-06-06) — Adds the `informed` field to the entry frontmatter schema (forward-link from contributing findings to higher-order entries they informed) and a new §"Active-learning hooks" section documenting the machine-readable surfaces, detection-layer signals, promotion-layer hooks, evolution-layer caution, and adopter discipline that produce active-learning-ready corpora today without committing to extension design. v0.2.0 (2026-06-07) — Relocates Category D's content from the §Audit-Variant section (same-file pattern, v0.1.x) to the auditor role file's own body (separate-file pattern, v0.2.0) to align with `auditor-pattern-spec.md` v0.2.0. Access discipline updated: the "builder MUST NOT load corpus" prohibition extends to the auditor role file itself under v0.2.0, because that file's body is Category D corpus material. Category role unchanged; location is. Other categories (A, B, C, E), entry frontmatter schema, growth rules, and active-learning hooks unchanged from v0.1.1.
+- summary: v0.1.0 — Initial specification of the audit corpus. Defines five entry categories (prior findings, failure post-mortems, drift catalogs, self-referential §Audit-Variant clauses, project-specific materials), default disk layout, entry frontmatter schema, growth rules (entry, supersession, incorporation), access discipline (asymmetric load, visible but not eager-loaded by builder), bootstrapping guidance for v0.1.0-empty corpora, and anti-pattern catalog. Operationalizes Mechanism 2 of auditor-pattern-spec.md v0.1.0. v0.1.1 (2026-06-06) — Adds the `informed` field to the entry frontmatter schema (forward-link from contributing findings to higher-order entries they informed) and a new §"Active-learning hooks" section documenting the machine-readable surfaces, detection-layer signals, promotion-layer hooks, evolution-layer caution, and adopter discipline that produce active-learning-ready corpora today without committing to extension design. v0.2.0 (2026-06-07) — Relocates Category D's content from the §Audit-Variant section (same-file pattern, v0.1.x) to the auditor role file's own body (separate-file pattern, v0.2.0) to align with `auditor-pattern-spec.md` v0.2.0. Access discipline updated: the "builder MUST NOT load corpus" prohibition extends to the auditor role file itself under v0.2.0, because that file's body is Category D corpus material. Category role unchanged; location is. Other categories (A, B, C, E), entry frontmatter schema, growth rules, and active-learning hooks unchanged from v0.1.1. v0.2.2 (2026-06-07) — Per Sketch Main Auditor's v0.2.0 review: (E2) corrects the frontmatter `references:` field that was still pinning `auditor-pattern-spec.md v0.1.0` after the v0.2.0 body update. (E3) scrubs three stale §Audit-Variant references that survived the v0.2.0 pass: the disk-layout diagram at the Category D entry (was "no files — Category D lives in the role file's §Audit-Variant section"; now correctly shows `README.md` present); the status-field explanation at growth rules (was "the post-mortem's lesson is now in the §Audit-Variant clauses"; now correctly references the auditor file's audit interpretations / cross-rule obligations); the post-mortem incorporation rule (same fix). (E4) reconciles the prior internal contradiction between this spec and `conformance-criteria.md` C-15 — both now agree that Category D's directory contains a `README.md` pointing to the auditor file (the empty-directory alternative didn't survive git anyway, and the README is the navigational artifact that makes the inclusion discoverable). No structural or normative changes; v0.2.0 implementations remain conformant after applying the same internal scrub to their own corpora.
