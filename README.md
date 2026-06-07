@@ -12,7 +12,7 @@ The pattern is designed to drop into existing role files (Aire-shaped, or any eq
 |---|---|
 | `auditor-pattern-spec.md` | The canonical specification. Encompassment principle + four mechanisms (encompassment scope, asymmetric failure-pattern corpus, adversarial default, independent re-derivation) + naming, authority, scope limits, integration requirements. |
 | `template-audit-variant-section.md` | Copy-pasteable skeleton for the `# §Audit-Variant` section. Annotated companion explaining what each preamble element is for. |
-| `audit-corpus-spec.md` | Structure, growth rules, and access discipline for the asymmetric corpus — the body of materials the auditor loads but the builder does not. |
+| `audit-corpus-spec.md` | Structure, growth rules, and access discipline for the asymmetric corpus — the body of materials the auditor loads but the builder does not. Includes active-learning hooks (v0.1.1) that make corpora programmatically analyzable by future tooling without schema changes. |
 | `adoption-guide.md` | Seven-step walkthrough from "role file with rules" to "conformant §Audit-Variant section landed." |
 | `conformance-criteria.md` | Sixteen criteria for verifying that an implementation realizes the pattern. Includes verdict structure and review procedure. |
 | `CHANGELOG.md` | Version history. |
@@ -39,6 +39,7 @@ Project Prestidigitonium resolves the tension. Surface identity, underlying inde
 - **Independent re-derivation** — derive-then-compare on key checks. Reading the builder's output before deriving is not permitted on these checks.
 - **§Audit-Variant** — the section in the role file where the audit lens is encoded. One audit-interpretation clause per rule plus cross-rule obligations.
 - **Supervisory layer** — the asymmetric portion of the auditor's knowledge: upstream governance authority + asymmetric corpus + adversarial posture + re-derivation discipline. What makes the auditor *more than* a different reading of the same words.
+- **Active-learning hooks** — frontmatter fields and structural conventions (`tags`, `applies_to_rules`, `informed`, `status` lifecycle) that make the corpus programmatically analyzable by future tooling. Three anticipated layers: detection (surfacing patterns), promotion (drafting candidates for human review), evolution (bounded self-modification, treated with skepticism). v0.1.1 documents the hooks; extensions deferred until accumulated real corpora provide evidence to design against.
 
 ## Why a separate repository
 
@@ -65,13 +66,13 @@ Nothing executes. No new infrastructure spins up. The pattern is operational the
 
 ## Status and stability
 
-This is **v0.1.0**, status **draft**. The pattern is internally consistent and operationally complete — it can be adopted now — but the corpus-population conventions (Categories A through E) will sharpen as real instances accumulate findings and post-mortems. Versioning policy is in `auditor-pattern-spec.md` §"Versioning"; breaking changes warrant a major bump and will be telegraphed in `CHANGELOG.md`.
+This is **v0.1.1**, status **draft**. The pattern is internally consistent and operationally complete — it can be adopted now — but the corpus-population conventions (Categories A through E) will sharpen as real instances accumulate findings and post-mortems. The v0.1.1 patch adds active-learning hooks to the corpus spec (forward-compatible; v0.1.0 implementations remain conformant). Versioning policy is in `auditor-pattern-spec.md` §"Versioning"; breaking changes warrant a major bump and will be telegraphed in `CHANGELOG.md`.
 
 Production adopters: pin to the commit hash you adopted against. v0.x.y is pre-stable; minor bumps may introduce new integration requirements.
 
 ## Roadmap (informal)
 
-- **v0.1.x** — clarifications, examples, additional drift-catalog templates.
+- **v0.1.x** — clarifications, examples, additional drift-catalog templates. *v0.1.1 (current): active-learning hooks added to corpus spec.*
 - **v0.2.0** — likely additions: project-level multi-role corpus sharing conventions; explicit cross-corpus pollination protocol; conformance criteria for the specifications themselves (self-conformance, currently reserved).
 - **v1.0.0** — declared when at least two independent projects have run the pattern in production for three months and the spec's evolution has stabilized.
 

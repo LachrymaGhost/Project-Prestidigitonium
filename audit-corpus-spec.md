@@ -1,6 +1,6 @@
 ---
 name: audit-corpus-spec
-version: 0.1.0
+version: 0.1.1
 status: draft
 license: Apache-2.0
 maintained_by: Aire System Architect (ASA)
@@ -108,9 +108,12 @@ applies_to_rules: [<rule-id>, …]              # for A and C; omit for B and E
 applies_to_role: <role-id or "all">
 supersedes: [<id>, …]                          # optional
 superseded_by: [<id>, …]                       # optional
+informed: [<id>, …]                            # optional — forward link to higher-order entries this informed (e.g., Category A → C promotion)
 tags: [<tag>, …]
 ---
 ```
+
+The `informed` field is the load-bearing forward-link for active-learning hooks (see §"Active-learning hooks" below). A Category A finding that contributed to a Category C drift catalog entry carries `informed: [C-<pattern-id>]`; programmatic analysis of `informed` linkages reveals which findings clustered into which patterns and where governance evolution traces back to specific evidence.
 
 The `status` field is the load-time signal: an auditor loading the corpus reads `active` entries normatively, `superseded` and `retracted` entries as historical context (visible but not authoritative), `incorporated` entries as resolved (the post-mortem's lesson is now in the §Audit-Variant clauses; the entry stays for traceability).
 
@@ -174,6 +177,61 @@ The following corpus practices undermine the pattern:
 - **Cataloging single-instance findings as Category C patterns.** Wait for three.
 - **Writing post-mortems without the "what would have caught this" field.** Without it, the post-mortem is a confession; with it, the post-mortem is corpus material.
 
+## Active-learning hooks (forward-compatible)
+
+The corpus is structured such that future tooling can analyze it programmatically without schema changes. This section documents the hooks that enable that analysis, so adopters authoring entries today produce material that downstream active-learning extensions can use tomorrow.
+
+Active-learning extensions themselves are out of scope for this specification. They are anticipated in a future companion specification (working title: `active-learning-spec.md`) authored when accumulated real corpora provide enough evidence to design against. v0.1.x deliberately defers the design rather than building against an empty corpus.
+
+### Machine-readable surfaces
+
+The following frontmatter fields are designed to be both human-readable and machine-parsable. Adopters SHOULD populate them consistently:
+
+- **`tags`** — controlled vocabulary at the project's discretion; the primary clustering signal. Tagging discipline matters: ad-hoc tags produce noise; consistent tags enable pattern detection.
+- **`applies_to_rules`** — the rule-level grouping signal. Findings clustered on the same rule are the most direct evidence that the rule may be ambiguously written or that the audit clause needs sharpening.
+- **`applies_to_role`** — the role-level grouping signal. Patterns observed across multiple roles within the same role-class (execution-heavy, authoring-heavy) become class-level drift catalogs.
+- **`status`** — the lifecycle signal. `active` entries inform present audits; `superseded` and `retracted` entries inform corpus health analysis (high retraction rates suggest auditor overreach; high supersession rates suggest pattern maturation).
+- **`supersedes` / `superseded_by`** — the lineage signal. Tracing supersession chains reveals how the auditor's understanding has evolved.
+- **`informed`** — the cross-category linkage signal. Category A findings citing the Category C pattern they contributed to enable provenance tracing from governance evolution back to specific evidence.
+
+### Detection-layer signals (future Layer 1)
+
+Future detection tooling will likely surface flags including (illustrative, not prescriptive):
+
+- **Clustering threshold** — N+ Category A findings sharing a tag or `applies_to_rules` value → "consider authoring a Category C drift pattern."
+- **Pattern decay** — Category C entries with no recent `informed` references from new findings → "pattern may be stale; review for retirement."
+- **Rule ambiguity** — finding cluster on a specific rule → "the rule itself may be ambiguously written; consider revision."
+- **Role-file defect signal** — auditor citing the same upstream-governance violation repeatedly → "this is a role-file defect, not an instance defect."
+- **Incorporation lag** — Category B post-mortems marked `accepted` for extended periods without `incorporated` status → "lesson identified but not landed; consider scheduling clause update."
+
+Detection-layer signals do not modify state. They surface observations for human action. Their value is removing the cognitive overhead of pattern-spotting in growing corpora.
+
+### Promotion-layer hooks (future Layer 2)
+
+Promotion-layer tooling drafts candidate updates for human review and acceptance. The corpus structure supports this without schema changes — drafts inherit frontmatter from the contributing entries; humans review the proposed material against the principles in `auditor-pattern-spec.md` and accept, edit, or reject. The corpus's append-only discipline ensures that promotion-layer drafts are visible artifacts (committed as candidates with `status: proposed`), not hidden state mutations.
+
+### Evolution-layer caution (future Layer 3)
+
+Self-modifying governance — the auditor editing its own clauses based on accumulated evidence — is a category of change this pattern is deeply skeptical of. The auditor pattern exists to catch builders that drift toward easier-to-pass interpretations of their own rules; the same skepticism applies recursively to auditors that might drift toward easier-to-pass interpretations of *their* own clauses.
+
+Adopters considering evolution-layer extensions SHOULD ensure:
+
+- Every state change is a versioned git commit with provenance.
+- Conformance criteria scan flags clause weakening as a defect class.
+- Human review remains the default path, even for routine incorporations.
+- The pattern's `auditor-pattern-spec.md` § "What this pattern does NOT solve" is updated to reflect any new failure modes the evolution-layer introduces.
+
+Evolution-layer extensions are not anticipated for v0.x of this specification. They may never be appropriate. Future maintainers: apply skepticism.
+
+### Discipline for adopters today
+
+To produce active-learning-ready corpora without speculating on extension design:
+
+1. **Populate frontmatter completely.** Optional fields are optional now; they may become load-bearing later. Populate them when the information exists.
+2. **Maintain tag vocabularies.** Author a short `tag-vocabulary.md` in `audit-corpus/` listing canonical tags and their meanings. Refactor tags via supersession (new entry with corrected tags references the old; old marked `superseded`), never by editing history.
+3. **Backfill `informed` when promotions happen.** When a Category A → Category C promotion occurs, edit the contributing Category A entries' `informed` fields. This is one of the few permitted edits to existing entries — it is metadata maintenance, not history mutation.
+4. **Don't speculate.** Do not pre-author entries for patterns that haven't been observed. Active-learning hooks reward real evidence, not anticipated evidence.
+
 # Change Control
 
 Update version and provenance on every change.
@@ -181,4 +239,4 @@ Update version and provenance on every change.
 ## Provenance
 - source: Initial draft.
 - time: 2026-06-06
-- summary: v0.1.0 — Initial specification of the audit corpus. Defines five entry categories (prior findings, failure post-mortems, drift catalogs, self-referential §Audit-Variant clauses, project-specific materials), default disk layout, entry frontmatter schema, growth rules (entry, supersession, incorporation), access discipline (asymmetric load, visible but not eager-loaded by builder), bootstrapping guidance for v0.1.0-empty corpora, and anti-pattern catalog. Operationalizes Mechanism 2 of auditor-pattern-spec.md v0.1.0.
+- summary: v0.1.0 — Initial specification of the audit corpus. Defines five entry categories (prior findings, failure post-mortems, drift catalogs, self-referential §Audit-Variant clauses, project-specific materials), default disk layout, entry frontmatter schema, growth rules (entry, supersession, incorporation), access discipline (asymmetric load, visible but not eager-loaded by builder), bootstrapping guidance for v0.1.0-empty corpora, and anti-pattern catalog. Operationalizes Mechanism 2 of auditor-pattern-spec.md v0.1.0. v0.1.1 (2026-06-06) — Adds the `informed` field to the entry frontmatter schema (forward-link from contributing findings to higher-order entries they informed) and a new §"Active-learning hooks" section documenting the machine-readable surfaces, detection-layer signals, promotion-layer hooks, evolution-layer caution, and adopter discipline that produce active-learning-ready corpora today without committing to extension design. Forward-compatible patch; no existing v0.1.0 implementation is invalidated. Active-learning extensions deferred to a future companion specification (anticipated `active-learning-spec.md`) authored when accumulated real corpora provide evidence to design against.
