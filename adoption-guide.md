@@ -1,6 +1,6 @@
 ---
 name: adoption-guide
-version: 0.2.0
+version: 0.2.1
 status: draft
 license: Apache-2.0
 maintained_by: Aire System Architect (ASA)
@@ -166,6 +166,94 @@ Everything that wasn't already there. The auditor:
 
 - **Skipping the scope-limits acknowledgment.** "The pattern doesn't solve X" is uncomfortable to write but essential.
 
+## Project CLAUDE.md routing under separate-file architecture
+
+Most Aire-shaped projects use a `CLAUDE.md` file at the project's `claude/` directory as the entry-point bootstrap: it tells the runtime which role file to read and lists governance imports. Under v0.1.x's same-file architecture, this was a non-issue — both lenses lived in the same file, so any CLAUDE.md routing to that file routed correctly. Under v0.2.0's separate-file architecture, the routing matters: the CLAUDE.md that anchors the builder MUST NOT route the auditor to the audited role's content, because doing so contaminates the auditor's cold-context posture before its own role file ever loads.
+
+This is a project-environment concern, not a property of the pattern itself, but adopters routinely hit it during onboarding. Three viable routing strategies:
+
+### Strategy A — Separate CLAUDE.md per role/auditor directory (recommended)
+
+Mirror the file-boundary asymmetry at the directory level. Most adopters should choose this.
+
+```
+project/
+├── claude/                                  # builder's environment
+│   ├── CLAUDE.md                            # → "Read role file: <role>.role.md"
+│   ├── <role>.role.md                       # audited role file
+│   └── (governance specs, kits, etc.)
+├── audit/                                   # auditor's environment
+│   ├── CLAUDE.md                            # → "Read role file: <role>-auditor.role.md;
+│   │                                            audited role lives at ../claude/<role>.role.md"
+│   ├── <role>-auditor.role.md               # auditor role file
+│   └── audit-corpus/                        # asymmetric corpus
+└── ...
+```
+
+**Invocation pattern.** Builder invocations happen in `claude/` (the existing pattern). Auditor invocations happen in `audit/` (new). The runtime reads the CLAUDE.md present in the directory it was invoked from — natural directory-determined dispatch with no conditional logic required.
+
+**Pros:**
+- File-boundary asymmetry extends to bootstrap-boundary asymmetry. The builder's CLAUDE.md never references the auditor file's existence; salience contamination is impossible by construction.
+- No "which instance am I" runtime ambiguity; the working directory answers the question.
+- Asymmetric corpus has a natural home (`audit/audit-corpus/`) that's accessible to the auditor by relative path and structurally invisible to the builder's bootstrap.
+- Matches the cleanest interpretation of v0.2.0's underlying principle: enforcement by structural separation rather than by reminder.
+
+**Cons:**
+- Two CLAUDE.md files instead of one; users need to know which directory to invoke from.
+- Cross-directory references (`audit/CLAUDE.md` pointing to `../claude/<role>.role.md` as the audited role) introduce a path coupling that has to be maintained if directories are reorganized.
+
+### Strategy B — Single CLAUDE.md with explicit instance dispatch
+
+Acceptable when invocation context is naturally explicit (e.g., the user always announces "acting as builder" or "acting as auditor" at session start).
+
+```markdown
+# Project CLAUDE.md
+
+## Instance dispatch
+- If invoked as **<Role>** (build mode): read `<role>.role.md`. Do NOT read `<role>-auditor.role.md` or `audit-corpus/`.
+- If invoked as **<Role> Auditor** (audit mode): read `<role>-auditor.role.md` (which loads `<role>.role.md` as a declared input). Asymmetric corpus at `audit-corpus/`.
+
+## Governance (common)
+...
+```
+
+**Pros:**
+- Single bootstrap file; no directory reorganization.
+- Lower onboarding friction for projects already organized around a single `claude/` directory.
+
+**Cons:**
+- Asymmetry depends on the runtime correctly dispatching from invocation context — which is exactly the load-discipline failure class v0.2.0 was meant to escape. Builder invocations that ignore the dispatch language re-introduce the v0.1.x failure mode.
+- The single CLAUDE.md *mentions* the auditor file even in the builder's path — salience contamination risk, though smaller than v0.1.x's full-text contamination.
+- "Which instance am I" is decided per-invocation by language convention rather than by directory structure.
+
+Use Strategy B only when Strategy A's directory cost is prohibitive or when dispatch is explicit and disciplined.
+
+### Strategy C — Auditor invocation bypasses CLAUDE.md auto-load
+
+In environments where the runtime supports direct invocation of a role file without reading CLAUDE.md (e.g., explicit `--role <path>` invocation flags, or non-Claude-Code platforms with different bootstrap models), the auditor can be invoked directly against its role file, skipping CLAUDE.md entirely.
+
+**Pros:**
+- Simplest architectural model — only the builder reads CLAUDE.md; auditor is "out of band."
+- Zero CLAUDE.md changes required.
+
+**Cons:**
+- Only viable when the runtime supports it.
+- Audit invocations are no longer first-class members of the project's bootstrap ecosystem; documenting them as "different from how the builder is invoked" creates onboarding friction.
+
+Use Strategy C only when runtime constraints favor it.
+
+### Recommendation
+
+For new adoptions: **Strategy A.** Mirror the file-boundary asymmetry at the directory level. The two-directory cost is modest; the structural cleanliness is substantial.
+
+For migrations from v0.1.x: **Strategy A** if directory reorganization is acceptable; **Strategy B** if not. Strategy B is a defensible interim during transition; recommend Strategy A as the stable end state.
+
+For all adoptions: **document the chosen strategy** in the auditor's role file Provenance and in the project's CLAUDE.md so downstream readers understand the bootstrap topology.
+
+### Conformance note
+
+The pattern spec (`auditor-pattern-spec.md`) does not mandate a routing strategy. Project CLAUDE.md routing is project-environment configuration, not a pattern-level concern. However, all three strategies satisfy the underlying requirement: the builder's session-start path MUST NOT load the auditor role file or the asymmetric corpus. Strategies that fail that requirement are non-conformant with `conformance-criteria.md` Criterion C-16.
+
 ## Migration from v0.1.x (same-file architecture)
 
 Projects that adopted v0.1.x of this pattern have a `# §Audit-Variant` section in their audited role files. Migration to v0.2.0:
@@ -216,4 +304,4 @@ Update version and provenance on every change.
 ## Provenance
 - source: Major revision per architectural inversion from same-file (v0.1.x) to separate-file (v0.2.0).
 - time: 2026-06-07
-- summary: v0.2.0 — Rewritten seven-step adoption walkthrough for v0.2.0 separate-file architecture. Steps now create a new auditor role file rather than add a §Audit-Variant section to the audited role file. New step 7 adds the reciprocal `audited_by:` frontmatter pointer to the audited role file (the only required edit to that file under v0.2.0). What-changes-for-builder section simplified (builder behavior virtually unchanged; new frontmatter field is informational). What-changes-for-auditor section expanded (auditor is now a full role file with its own Operating Rules, Verification, Inputs). New "Migration from v0.1.x" section walks v0.1.x adopters through extracting their §Audit-Variant sections into separate auditor files. Failure modes updated with v0.2.0-specific cases (frontmatter pointer omissions, auditor-file-loaded-by-builder). Companion to auditor-pattern-spec.md v0.2.0 and template-auditor-role-file.md v0.2.0.
+- summary: v0.2.0 — Rewritten seven-step adoption walkthrough for v0.2.0 separate-file architecture. Steps now create a new auditor role file rather than add a §Audit-Variant section to the audited role file. New step 7 adds the reciprocal `audited_by:` frontmatter pointer to the audited role file (the only required edit to that file under v0.2.0). What-changes-for-builder section simplified (builder behavior virtually unchanged; new frontmatter field is informational). What-changes-for-auditor section expanded (auditor is now a full role file with its own Operating Rules, Verification, Inputs). New "Migration from v0.1.x" section walks v0.1.x adopters through extracting their §Audit-Variant sections into separate auditor files. Failure modes updated with v0.2.0-specific cases (frontmatter pointer omissions, auditor-file-loaded-by-builder). Companion to auditor-pattern-spec.md v0.2.0 and template-auditor-role-file.md v0.2.0. v0.2.1 (2026-06-07) — Adds new "Project CLAUDE.md routing under separate-file architecture" section per Sketch Main Auditor's observation that hardcoded CLAUDE.md references to the audited role file's content contaminate the auditor's cold-context posture at boot under v0.2.0. Three routing strategies documented: Strategy A — separate CLAUDE.md per role/auditor directory (recommended; mirrors file-boundary asymmetry at directory level); Strategy B — single CLAUDE.md with explicit instance dispatch (acceptable when invocation context is naturally explicit); Strategy C — auditor invocation bypasses CLAUDE.md auto-load (only viable when runtime supports it). All three satisfy Criterion C-16 when implemented correctly; the pattern spec does not mandate a strategy. Recommendation: Strategy A for new adoptions; Strategy A for migrations where feasible (B as defensible interim).

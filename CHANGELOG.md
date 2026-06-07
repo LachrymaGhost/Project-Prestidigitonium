@@ -2,6 +2,19 @@
 
 All notable changes to Project Prestidigitonium are documented here. Versioning follows semantic versioning per `auditor-pattern-spec.md` §"Versioning."
 
+## [0.2.1] — 2026-06-07
+
+### Added
+- `auditor-pattern-spec.md` v0.2.1 — Explicit supersession of v0.1.x's "no separate file" architectural language. Quotes the v0.1.x template's note ("The role IS the capability; `audit` is one of two lenses... there is no separate `*-auditor.role.md` file") and the v0.1.x adoption-guide statement that adopters wondering if they needed one "do not." States the reversal under v0.2.0+ so adopters pinned to v0.1.x reading the confident "no" understand the project itself has changed direction.
+- `auditor-pattern-spec.md` §"The shift in plain terms" — articulates *why* the architectural inversion is an improvement rather than a reorganization: v0.1.x asymmetry was enforced by load-discipline (reminder, not gate); v0.2.0 asymmetry is enforced by the file boundary itself (structural, not declarative). Framing credited to Sketch Main Auditor's observation.
+- `adoption-guide.md` v0.2.1 — New "Project CLAUDE.md routing under separate-file architecture" section documenting three routing strategies (Strategy A: separate CLAUDE.md per role/auditor directory, recommended; Strategy B: single CLAUDE.md with explicit instance dispatch; Strategy C: auditor invocation bypasses CLAUDE.md auto-load). Addresses the salience-contamination risk when a hardcoded CLAUDE.md routes both builder and auditor invocations to the audited role's content.
+
+### Origin
+Both additions originated from Sketch Main Auditor's review of the archive branch + main bookmark before v0.2.0 was pushed. Their observations: (1) the v0.1.x confident "no" needed explicit forward supersession in v0.2.0; (2) CLAUDE.md routing under v0.2.0 deserved adoption guidance, not just structural-requirement implication. Both incorporated.
+
+### Conformance
+v0.2.1 is editorial relative to v0.2.0 — no integration-requirement changes; no conformance-criteria changes. v0.2.0 implementations remain conformant under v0.2.1 without modification.
+
 ## [0.2.0] — 2026-06-07
 
 ### Changed (BREAKING — major architectural revision)

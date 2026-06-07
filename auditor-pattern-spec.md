@@ -1,6 +1,6 @@
 ---
 name: auditor-pattern-spec
-version: 0.2.0
+version: 0.2.1
 status: draft
 license: Apache-2.0
 maintained_by: Aire System Architect (ASA)
@@ -25,6 +25,18 @@ v0.1.x of this specification committed to a *same-file* architecture — adding 
 - Same-file architecture preserved domain fluency at the cost of shared blind spots: an auditor reading the same words cannot catch what those words do not say.
 - Mechanism-level mitigations (asymmetric corpus, adversarial frame, independent re-derivation) addressed the symptom without addressing the structural cause.
 - Separate-file architecture addresses the cause directly: the auditor's own rules, posture, and rules live in a different file. The audited role file becomes an input, not the authority.
+
+### Explicit supersession of v0.1.x language
+
+v0.1.x's template carried this architectural note: *"The auditor uses **this same role spec** with an audit lens — there is no separate `*-auditor.role.md` file. The role IS the capability; `audit` is one of two lenses (alongside `execute`) for applying it."* and the v0.1.x adoption guide said adopters who wondered if they needed a separate auditor file *"do not."*
+
+**v0.2.0 reverses both statements.** A separate `<audited-role-slug>-auditor.role.md` file IS now required for conformance (Criterion C-1). Adopters who pinned to v0.1.x reading the confident "no" should understand the project itself has reversed that commitment; the v0.1.x architectural note is hereby superseded for any implementation targeting v0.2.0+. Implementations pinned to v0.1.x remain valid against the v0.1.x spec on the `archive/v0.1.x-same-file-architecture` branch — but they are not v0.2.0-conformant, and the canonical direction is the inversion.
+
+### The shift in plain terms
+
+v0.1.x asymmetry was enforced by **load-discipline** — a written instruction that the builder MUST NOT load the §Audit-Variant section even though it lived in the same file the builder otherwise re-read at every anchor. That class of asymmetry is enforced only by instruction-following, which is precisely the failure class the auditor pattern is meant to catch (a reminder, not a gate).
+
+v0.2.0 asymmetry is enforced by the **file boundary**. The auditor file is at a different path; the builder's session-start load list does not reference it; the auditor's corpus and clauses cannot contaminate the builder's context by accident. **The asymmetry shifted from declarative to structural** — from a load-discipline reminder to a file-system gate. This is consistent with the foundations-spec taxonomy: dynamic enforcement supersedes declarative enforcement wherever it can.
 
 The four mechanisms below survive the inversion — they remain load-bearing — but their operationalization moves from "section in the audited role file" to "structure of the separate auditor file." Adopters who deployed under v0.1.x can stay there (the archive branch preserves it); v0.2.0 is the canonical direction going forward.
 
@@ -197,4 +209,4 @@ Update version and provenance on every change.
 ## Provenance
 - source: Architectural revision of v0.1.x.
 - time: 2026-06-07
-- summary: v0.2.0 — Inverts the architectural commitment from same-file (audit lens as `# §Audit-Variant` section in the audited role's file) to separate-file (auditor lives in `<audited-role>-auditor.role.md`, with the audited role file declared as an Input via reciprocal `audits:` / `audited_by:` frontmatter pointers). Reasoning: same-file preserved domain fluency at the cost of shared source text — the auditor reading the same words could not catch what those words did not say. Mechanism-level mitigations (asymmetric corpus, adversarial frame, independent re-derivation) addressed the symptom; separate-file addresses the structural cause. The four mechanisms survive the inversion: encompassment scope becomes structurally explicit (audited role declared as input), asymmetric corpus access discipline shifts to loaded by the auditor file alone, adversarial default and independent re-derivation remain unchanged. Integration requirements rewritten around the separate-file topology. Naming convention introduced: filename `<audited-role-slug>-auditor.role.md`; display name `<Project> <Role> Auditor`. v0.1.x implementations remain documented at archive branch `archive/v0.1.x-same-file-architecture`; not invalidated but no longer the canonical direction. Major version bump.
+- summary: v0.2.0 — Inverts the architectural commitment from same-file (audit lens as `# §Audit-Variant` section in the audited role's file) to separate-file (auditor lives in `<audited-role>-auditor.role.md`, with the audited role file declared as an Input via reciprocal `audits:` / `audited_by:` frontmatter pointers). Reasoning: same-file preserved domain fluency at the cost of shared source text — the auditor reading the same words could not catch what those words did not say. Mechanism-level mitigations (asymmetric corpus, adversarial frame, independent re-derivation) addressed the symptom; separate-file addresses the structural cause. The four mechanisms survive the inversion: encompassment scope becomes structurally explicit (audited role declared as input), asymmetric corpus access discipline shifts to loaded by the auditor file alone, adversarial default and independent re-derivation remain unchanged. Integration requirements rewritten around the separate-file topology. Naming convention introduced: filename `<audited-role-slug>-auditor.role.md`; display name `<Project> <Role> Auditor`. v0.1.x implementations remain documented at archive branch `archive/v0.1.x-same-file-architecture`; not invalidated but no longer the canonical direction. Major version bump. v0.2.1 (2026-06-07) — Adds explicit supersession of v0.1.x architectural language (quoting the v0.1.x template's "no separate file" note and stating its reversal under v0.2.0+) per Sketch Main Auditor's observation that the confident v0.1.x "no" could mislead adopters pinned to v0.1.1. Adds the "asymmetry shifted from declarative to structural" framing — load-discipline reminder replaced by file-system gate — articulating the load-bearing reason the architectural inversion is an improvement rather than just a reorganization. Editorial clarification; no integration-requirement changes from v0.2.0.

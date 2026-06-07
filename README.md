@@ -77,7 +77,7 @@ Nothing executes. No new infrastructure spins up. The pattern is operational the
 
 ## Status and stability
 
-This is **v0.2.0**, status **draft**. The architectural revision from v0.1.x to v0.2.0 was a major inversion. The pattern is internally consistent and operationally complete — it can be adopted now — but corpus-population conventions will sharpen as real instances accumulate findings and post-mortems.
+This is **v0.2.1**, status **draft**. The architectural revision from v0.1.x to v0.2.0 was a major inversion. v0.2.1 adds an explicit supersession of v0.1.x's "no separate file" architectural language and a new CLAUDE.md routing section in the adoption guide (three strategies; Strategy A — separate CLAUDE.md per role/auditor directory — recommended). The pattern is internally consistent and operationally complete — it can be adopted now — but corpus-population conventions will sharpen as real instances accumulate findings and post-mortems.
 
 Versioning policy is in `auditor-pattern-spec.md` §"Versioning."
 
@@ -90,7 +90,7 @@ Production adopters: pin to the commit hash you adopted against. v0.x.y is pre-s
 
 ## Roadmap (informal)
 
-- **v0.2.x** — clarifications, examples, additional drift-catalog templates, real-corpus learnings as they accumulate.
+- **v0.2.x** — clarifications, examples, additional drift-catalog templates, real-corpus learnings as they accumulate. *v0.2.1 (current): v0.1.x supersession language + CLAUDE.md routing section.*
 - **v0.3.0** — likely additions: project-level multi-role corpus sharing conventions; explicit cross-corpus pollination protocol; conformance criteria for the specifications themselves (self-conformance, currently reserved).
 - **v1.0.0** — declared when at least two independent projects have run the pattern in production for three months and the spec's evolution has stabilized.
 
