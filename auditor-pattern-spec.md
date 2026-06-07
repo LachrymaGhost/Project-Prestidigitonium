@@ -1,6 +1,6 @@
 ---
 name: auditor-pattern-spec
-version: 0.1.0
+version: 0.2.0
 status: draft
 license: Apache-2.0
 maintained_by: Aire System Architect (ASA)
@@ -11,18 +11,28 @@ domain_tags: [governance, pattern, audit]
 
 ## Purpose
 
-This specification defines a domain-agnostic pattern for instantiating an **auditor** alongside a working role (a "builder") in any role-based AI governance system. The pattern is designed so that a single template can be plug-and-played into any role file to produce a paired auditor that is simultaneously:
+This specification defines a domain-agnostic pattern for instantiating an **auditor** alongside a working role (a "builder") in any role-based AI governance system. The pattern is designed so that an auditor can be added to any role with minimal ceremony — by authoring a **separate auditor role file** that declares the audited role as an input — while preserving:
 
-1. **Fluent in the role's domain** — enough to recognize substantive defects, not merely procedural ones.
-2. **Independent enough to catch correlated blind spots** — not merely re-reading the same rules and confirming the builder's interpretation.
+1. **Fluency in the audited role's domain** — the auditor reads the audited role's file as a declared input, so it knows the work the builder does.
+2. **Independence from the audited role's blind spots** — the auditor's *own* rules, reading posture, and authority chain live in a separate file, written with the failure modes of the audited role in mind.
 
-The pattern resolves the central tension in same-source auditing: an auditor that shares the builder's source text inherits the builder's blind spots; an auditor that doesn't share the source text loses domain fluency. Both failure modes are common, and naive same-file audit lenses produce the first while naive fully-independent reviewers produce the second.
+The pattern resolves the central tension in same-source auditing: an auditor that shares the builder's source text inherits the builder's blind spots; an auditor that doesn't share the source text loses domain fluency. The resolution is **physical separation with declared inclusion** — the auditor file is separate, but the audited role's file is loaded as input. Surface familiarity (the auditor reads the audited role); underlying independence (the auditor's own rules and stance live elsewhere).
+
+## Why v0.2.0 inverted v0.1.x
+
+v0.1.x of this specification committed to a *same-file* architecture — adding a `# §Audit-Variant` section to the audited role's own file. v0.2.0 inverts that commitment to **separate files**. The reasoning:
+
+- Same-file architecture preserved domain fluency at the cost of shared blind spots: an auditor reading the same words cannot catch what those words do not say.
+- Mechanism-level mitigations (asymmetric corpus, adversarial frame, independent re-derivation) addressed the symptom without addressing the structural cause.
+- Separate-file architecture addresses the cause directly: the auditor's own rules, posture, and rules live in a different file. The audited role file becomes an input, not the authority.
+
+The four mechanisms below survive the inversion — they remain load-bearing — but their operationalization moves from "section in the audited role file" to "structure of the separate auditor file." Adopters who deployed under v0.1.x can stay there (the archive branch preserves it); v0.2.0 is the canonical direction going forward.
 
 ## Problem statement
 
 A role file specifies how a builder should reason about and act within its domain. If a defect lives inside that specification — an unstated assumption, a missing trigger, a conflated category — a reader who treats the specification as authoritative cannot see the defect; the defect is invisible *because* it is the lens through which the reader perceives. Adding an "auditor lens" that reads the same specification with a different intent does not solve this: same words cannot catch what the words do not say.
 
-This pattern produces auditor instances whose source of truth, reading posture, and asymmetric knowledge access are structured such that builder-side blind spots become visible from the auditor's vantage — without sacrificing the auditor's domain expertise.
+This pattern produces auditor instances whose source of truth, reading posture, and asymmetric knowledge access are structured such that builder-side blind spots become visible from the auditor's vantage — without sacrificing the auditor's domain fluency.
 
 ## The Encompassment Principle
 
@@ -33,30 +43,30 @@ auditor_knowledge ⊇ builder_knowledge
 auditor_knowledge \ builder_knowledge ≠ ∅
 ```
 
-The auditor reads everything the builder reads (shared domain corpus) **and** material the builder does not load (asymmetric corpus). The auditor's reading posture and authority chain differ from the builder's even where the corpus overlaps.
+The auditor reads everything the builder reads (the audited role's file, the brief, the domain corpus, the governance specs) **and** material the builder does not load (the asymmetric corpus). The auditor's reading posture and authority chain differ from the builder's even where the corpus overlaps.
 
-This is the **structural** version of the principle. Its expression in the role file is the **§Audit-Variant** section (see `template-audit-variant-section.md`), which encodes the auditor's interpretation of each operating rule alongside cross-rule obligations that bind the auditor across the rule set.
+In v0.2.0's separate-file architecture, encompassment is *structurally explicit*: the audited role's file is declared as an input in the auditor's frontmatter (`audits:` field) and loaded at session start. The audited role file does not contain the audit lens; the auditor file does. Inclusion-by-input rather than inclusion-by-section.
 
-Encompassment alone is necessary but not sufficient. The auditor must also be configured by the four mechanisms below to convert encompassment from passive scope expansion into active blind-spot coverage.
+The four mechanisms below configure encompassment from passive scope expansion into active blind-spot coverage.
 
 ## The Four Mechanisms
 
 ### Mechanism 1 — Encompassment scope
 
-The auditor's authority chain bottoms out in **upstream governance** (the base role template, kit specs, foundations spec, the project's brief and contract) plus the **asymmetric corpus** (Mechanism 2). The role file's rules are themselves an audit subject — verifiable against upstream governance — not the final word.
+The auditor's authority chain bottoms out in **upstream governance** (the base role template, kit specs, foundations spec, the project's brief and contract) plus the **asymmetric corpus** (Mechanism 2). The audited role's rules are themselves an audit subject — verifiable against upstream governance — not the final word.
 
-Concretely: if the role file states "X is required" and no upstream governance spec requires X, the auditor is empowered to flag the role file's rule as the defect rather than confirm the builder's compliance with a possibly-erroneous rule.
+Concretely: if the audited role's file states "X is required" and no upstream governance spec requires X, the auditor is empowered to flag the audited role's rule as the defect rather than confirm the builder's compliance with a possibly-erroneous rule.
 
-This is the substantive content of "the auditor encompasses the role." It does not promote the auditor above the user; the user retains ultimate authority. It promotes the auditor above the role file as a reading authority.
+This is the substantive content of "the auditor encompasses the role." It does not promote the auditor above the user; the user retains ultimate authority. It promotes the auditor above the audited role file as a reading authority.
 
 ### Mechanism 2 — Asymmetric failure-pattern corpus
 
 The auditor reads material that the builder does **not** load by default. This corpus is asymmetric by design and contains:
 
 - **Prior audit findings.** Durable record of defects caught in past sessions, indexed by rule and failure pattern.
-- **Failure post-mortems.** Narrative reconstructions of how a defect was missed, what reasoning produced the miss, and what would have caught it earlier.
-- **Drift catalogs.** Documented patterns of how *this kind of builder* tends to fail (e.g., for execution-heavy roles: optimism in interpretation, tunnel vision under iteration pressure; for authoring-heavy roles: silently dropping requirements, citing deprecated references).
-- **The §Audit-Variant clauses themselves**, which are written *with builder failure modes in mind* — they are auditor-corpus material whether or not we name them as such.
+- **Failure post-mortems.** Narrative reconstructions of how a defect was missed.
+- **Drift catalogs.** Documented patterns of how *this kind of builder* tends to fail.
+- **The auditor file's own rule bodies**, which are written *with builder failure modes in mind* — they are auditor-corpus material by design.
 - **Gotchas / negative-result documentation** that the builder does not load to avoid biasing toward known-bad patterns by salience.
 
 The asymmetric corpus is the auditor's specialty knowledge: it is what makes the auditor an **expert on how this kind of reasoning fails**. The builder remains expert on *the work*; the auditor adds expertise on *the failure modes of the work*.
@@ -67,72 +77,98 @@ The structure, growth rules, and access discipline for the asymmetric corpus are
 
 The auditor's default verdict is **refuted**. Verdicts flip to **confirmed** only on the basis of evidence that survives an attempt to refute it.
 
-This is an epistemic stance, not a procedure. Audit clauses are phrased in terms of what the auditor *attempts to refute* (e.g., "the auditor attempts to refute the claim that this completion is evidence-based"), not what the auditor verifies. The grammatical inversion is load-bearing: the verification frame biases toward confirmation; the refutation frame biases toward catching defects.
+Audit clauses are phrased in terms of what the auditor *attempts to refute*, not what the auditor verifies. The grammatical inversion is load-bearing: the verification frame biases toward confirmation; the refutation frame biases toward catching defects.
 
-The adversarial default is the disciplinary counterweight to the familiarity that encompassment produces. An encompassing auditor that defaults to "this looks fine, I would have done it the same way" provides no independent check. The adversarial default forecloses that drift by requiring evidence to *clear* the verdict, not evidence to *raise* a flag.
+The adversarial default is the disciplinary counterweight to the familiarity that encompassment produces. An encompassing auditor that defaults to "this looks fine, I would have done it the same way" provides no independent check.
 
 ### Mechanism 4 — Independent re-derivation on key checks
 
-On any check where the auditor could read the builder's reasoning and rubber-stamp it, the auditor is required to **compute its own answer first**, then compare. The check is two-stage: derive, then compare. Reading the builder's output before deriving is not permitted on these checks.
+On any check where the auditor could read the builder's output and rubber-stamp it, the auditor is required to **compute its own answer first**, then compare. The check is two-stage: derive, then compare.
 
 Key-check categories that require independent re-derivation:
 
-- Independent **re-measurement** of any reported numeric value (for execution roles).
-- Independent **re-classification** of any decision class (Class A / B / C).
-- Independent **re-derivation** of what acceptance criteria mean in the current context.
-- Independent **rule-applicability mapping** — which rules govern this work, derived from the brief and governance, not from the builder's invocation.
-- Independent **completeness check** — what *should* be present, derived from upstream specs, regardless of what the builder produced.
+- **Section presence** — derive from base template what sections MUST appear; then check the artifact.
+- **Frontmatter completeness** — derive from base template + role-specific declarations what fields MUST appear; then check the artifact.
+- **Relational primitive enumeration** — derive from base template; then check the artifact.
+- **Governance embedding requirements** — derive each requirement from its governance spec; then check the artifact's embed.
+- **Multi-agent artifact prohibition** (or analogous prohibitions for the project) — derive from normative requirements; then check the artifact.
+- **Governance reference resolution** — derive the list of referenced paths from the artifact; then check each path exists.
+- **Re-measurement** — for roles producing numeric outputs.
+- **Re-classification** — for roles producing categorical outputs.
 
-Independent re-derivation is the disciplinary counterweight to "I would have made the same call." It refuses the auditor the comfort of reading the answer before forming its own.
+The category list is role-specific. The auditor file enumerates which categories apply to *its* audit subject.
 
 ## Naming convention
 
-Auditor instances are named functionally: **`<Project> <Role> Auditor`**.
+Auditor role files are named: **`<audited-role-slug>-auditor.role.md`**.
 
 Examples:
-- A renderer project named "Sketch" with an Operator role → **Sketch Operator Auditor**.
-- A role-authoring project (e.g., Aire) with a RoleSmith role → **RoleSmith Auditor** (project name implicit when self-evident).
+- A role at `aire-smith.role.md` → `aire-smith-auditor.role.md`.
+- A role at `sketch-operator.role.md` → `sketch-operator-auditor.role.md`.
+- A role at `sketch.role.md` (the Sketch Builder) → `sketch-auditor.role.md`.
 
-The name says what the auditor does. Metaphor language (foreman/boss, twin androids, etc.) may inform design discussion but **does not appear in the artifact**.
+Display naming (in headings, prose, conversational reference): `<Project> <Role> Auditor`.
+
+Metaphor language (foreman/boss, twin androids, etc.) may inform design discussion but **does not appear in the artifact**.
 
 ## Authority and precedence
 
-When the §Audit-Variant clauses and the execute-mode rule bodies appear to conflict, **the execute-mode rule body is authoritative**. The §Audit-Variant clauses are the auditor's interpretation of how to verify compliance with the execute-mode rules; they are not a separate, independent obligation.
+Three-level precedence:
 
-When the role file's rules and upstream governance appear to conflict, **upstream governance is authoritative** (Mechanism 1). The auditor flags the role file's rule as the defect and proposes the upstream-conforming revision.
+1. **User authoritative over auditor verdict.** The auditor logs divergence, surfaces it, and complies; the auditor does not override the user. This is true regardless of the auditor's confidence in its own finding.
 
-When the auditor's verdict and the user's directive appear to conflict, **the user is authoritative**. The auditor logs the divergence, surfaces it, and complies; the auditor does not override the user. This is true regardless of the auditor's confidence in its own finding.
+2. **Upstream governance authoritative over the audited role's rules.** When the audited role file's rules and upstream governance conflict, upstream governance wins. The auditor flags the audited role's rule as the defect and proposes the upstream-conforming revision (never edits unilaterally).
+
+3. **Audited role's rules authoritative over audit-interpretation phrasing on lens conflicts.** When an audit interpretation could read in a way the audited role's rule body doesn't actually require, the rule body controls — audit interpretations clarify how to verify the rule, they don't extend it.
 
 The asymmetric corpus does not supersede upstream governance; it supplements it with documented failure patterns. Corpus entries that conflict with current governance are flagged as **superseded** rather than overriding.
+
+## File-relationship topology
+
+In the separate-file architecture, three files (and one optional directory) are in play for each adoption:
+
+| File | Authored by | Purpose |
+|---|---|---|
+| `<audited-role>.role.md` | RoleSmith (or equivalent role authority) | The role being audited. Its frontmatter carries `audited_by: <audited-role>-auditor.role.md` as a reciprocal pointer. No `# §Audit-Variant` section. |
+| `<audited-role>-auditor.role.md` | RoleSmith (or equivalent) | The auditor's own role spec. Frontmatter carries `audits: <audited-role>.role.md` and `follows_pattern: Project Prestidigitonium`. Contains the four-mechanism preamble, the auditor's own Operating Rules, the per-criterion audit interpretations for the audited role, and the cross-rule obligations. |
+| Upstream governance specs | Project governance authority | Read by both audited role and auditor. The auditor's authority chain anchors here. |
+| `audit-corpus/` (optional at v0.1.0-empty) | Auditor maintainers over time | Asymmetric corpus per `audit-corpus-spec.md`. |
+
+The reciprocal `audits:` ↔ `audited_by:` frontmatter pointers make the relationship discoverable and machine-checkable. Adopters who omit them are non-conformant (Criterion C-1 in `conformance-criteria.md` v0.2.0).
 
 ## What this pattern does NOT solve
 
 Honest scope: this pattern resolves correlated blind spots arising from **shared source text**. It does not, by itself, resolve:
 
-- **Capability blind spots** — defects the auditor *could* in principle catch but lacks the technical capability to detect (e.g., a measurement instrument the auditor cannot re-invoke). Mitigated by Mechanism 4 but not eliminated.
-- **Adversarial-input failures** — defects induced by inputs deliberately crafted to evade audit. Out of scope for this pattern; addressed by separate security review disciplines.
+- **Capability blind spots** — defects the auditor *could* in principle catch but lacks the technical capability to detect.
+- **Adversarial-input failures** — defects induced by inputs deliberately crafted to evade audit. Out of scope for this pattern.
 - **Definitional disputes about what constitutes a defect** — the auditor and the user may disagree about whether a finding is real. The pattern routes such disputes to the user; it does not arbitrate them.
-- **Sustained-load attention failures** — an auditor that runs continuously may itself drift over long sessions. Anchor beacons and session-restart discipline mitigate; the pattern does not eliminate.
+- **Sustained-load attention failures** — an auditor that runs continuously may itself drift over long sessions.
+- **Meta-audit (auditing the auditor)** — at v0.2.0, the auditor's own role file is not audited by another auditor. The user and peer-triangulation are the meta-audit surfaces. Recursive meta-audit chains are out of scope.
 
 These are real limits. Implementations should not claim coverage beyond the pattern's scope.
 
 ## Integration requirements
 
-A role file is **conformant** with this pattern when it satisfies the following requirements. Detailed verification procedure lives in `conformance-criteria.md`.
+A role-and-auditor adoption is **conformant** with this pattern when it satisfies the following requirements. Detailed verification procedure lives in `conformance-criteria.md` v0.2.0.
 
-1. **A §Audit-Variant section exists** in the role file, structured per `template-audit-variant-section.md`, with one audit-interpretation clause per operating rule (or verification check) plus a minimum of three cross-rule audit obligations.
+1. **A separate auditor role file exists** at `<audited-role>-auditor.role.md` (canonical naming), structured per `template-auditor-role-file.md`, with `audits:` and `follows_pattern:` frontmatter fields populated.
 
-2. **The auditor's authority chain is declared** in the §Audit-Variant preamble: upstream governance + asymmetric corpus, with execute-mode rule bodies authoritative on lens conflicts.
+2. **The audited role file declares the pointer** `audited_by: <audited-role>-auditor.role.md` in its frontmatter. Reciprocal discoverability.
 
-3. **An asymmetric corpus is named** — by file, directory, or convention — and a discipline is stated for what the builder MUST NOT load. (See `audit-corpus-spec.md` for the corpus's internal structure.)
+3. **The auditor's authority chain is declared** in the auditor file's Normative Requirements: upstream governance + asymmetric corpus, with the user-supreme three-level precedence.
 
-4. **The adversarial default is stated** as the auditor's epistemic posture. Phrasing of audit clauses follows the refutation frame.
+4. **An asymmetric corpus is named** in the auditor file's Inputs — by directory path or convention — and the discipline for what the builder MUST NOT load is stated.
 
-5. **Independent re-derivation requirements are enumerated** for the role's key-check categories. The role file states which categories require derive-then-compare and which permit read-then-verify.
+5. **The adversarial default is stated** as the auditor's epistemic posture. Phrasing of audit interpretations follows the refutation frame.
 
-6. **The naming convention is followed**: the auditor instance is referred to as `<Project> <Role> Auditor` in the role file's §Audit-Variant heading and any cross-references.
+6. **Independent re-derivation requirements are enumerated** in the auditor file's Operating Rules, naming key-check categories for the audited role.
 
-7. **The "does not solve" limits are acknowledged** in the §Audit-Variant section, even by reference. Implementations that silently claim coverage beyond the pattern's scope are non-conformant.
+7. **The naming convention is followed**: filename `<audited-role-slug>-auditor.role.md`; display name `<Project> <Role> Auditor`.
+
+8. **The "does not solve" limits are acknowledged** in the auditor file's Scope section, even by reference.
+
+9. **No `# §Audit-Variant` section in the audited role file.** v0.2.0 forecloses the same-file pattern; audited role files contain no audit lens content.
 
 ## Versioning
 
@@ -140,15 +176,17 @@ This specification follows semantic versioning.
 
 - **Patch (0.x.y → 0.x.y+1)**: clarifications, examples, typo fixes, non-normative additions.
 - **Minor (0.x.y → 0.x+1.0)**: new mechanisms, new integration requirements that do not invalidate existing conformant implementations, new corpus categories.
-- **Major (0.x.y → x+1.0.0)**: changes that invalidate existing conformant implementations (e.g., renaming a mechanism, restructuring the §Audit-Variant skeleton).
+- **Major (0.x.y → x+1.0.0)**: changes that invalidate existing conformant implementations.
 
-Conformant implementations declare which version of this spec they target.
+v0.1.x → v0.2.0 was a major architectural revision (same-file → separate-file). Implementations targeting v0.1.x remain documented on the `archive/v0.1.x-same-file-architecture` branch.
+
+Conformant implementations declare which version of this spec they target via their auditor file's frontmatter (`follows_pattern: Project Prestidigitonium v0.2.0` or similar).
 
 ## Related patterns
 
-- **Aire foundations + kits** — the architectural substrate this pattern composes with. An auditor's asymmetric corpus is naturally implemented as a kit-style module.
-- **Aire-TOC** (`https://github.com/LachrymaGhost/Aire-TOC`) — the context-routing pattern; complementary at a different layer. TOC routes which context surfaces; this pattern governs how a particular role's outputs are audited within whatever context is routed.
-- **Aire base role template** (`claude.role.base.md`) — the role-shape substrate. §Audit-Variant sections are added to roles derived from this template.
+- **Aire foundations + kits** — the architectural substrate this pattern composes with.
+- **Aire-TOC** (`https://github.com/LachrymaGhost/Aire-TOC`) — context-routing pattern; complementary at a different layer.
+- **Aire base role template** (`claude.role.base.md`) — the role-shape substrate. Both audited and auditor role files derive from it.
 
 This pattern is additive to all three; it does not replace any of them.
 
@@ -157,6 +195,6 @@ This pattern is additive to all three; it does not replace any of them.
 Update version and provenance on every change.
 
 ## Provenance
-- source: Initial draft.
-- time: 2026-06-06
-- summary: v0.1.0 — Initial specification of the auditor pattern. Establishes encompassment principle, four mechanisms (encompassment scope, asymmetric failure-pattern corpus, adversarial default, independent re-derivation), naming convention, authority precedence, scope limits, integration requirements, and versioning conventions. Domain-agnostic; intended for plug-and-play instantiation in any role-based AI governance system. References Aire foundations+kits, Aire-TOC, and Aire base role template as related but non-required substrates.
+- source: Architectural revision of v0.1.x.
+- time: 2026-06-07
+- summary: v0.2.0 — Inverts the architectural commitment from same-file (audit lens as `# §Audit-Variant` section in the audited role's file) to separate-file (auditor lives in `<audited-role>-auditor.role.md`, with the audited role file declared as an Input via reciprocal `audits:` / `audited_by:` frontmatter pointers). Reasoning: same-file preserved domain fluency at the cost of shared source text — the auditor reading the same words could not catch what those words did not say. Mechanism-level mitigations (asymmetric corpus, adversarial frame, independent re-derivation) addressed the symptom; separate-file addresses the structural cause. The four mechanisms survive the inversion: encompassment scope becomes structurally explicit (audited role declared as input), asymmetric corpus access discipline shifts to loaded by the auditor file alone, adversarial default and independent re-derivation remain unchanged. Integration requirements rewritten around the separate-file topology. Naming convention introduced: filename `<audited-role-slug>-auditor.role.md`; display name `<Project> <Role> Auditor`. v0.1.x implementations remain documented at archive branch `archive/v0.1.x-same-file-architecture`; not invalidated but no longer the canonical direction. Major version bump.

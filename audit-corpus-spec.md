@@ -1,6 +1,6 @@
 ---
 name: audit-corpus-spec
-version: 0.1.1
+version: 0.2.0
 status: draft
 license: Apache-2.0
 maintained_by: Aire System Architect (ASA)
@@ -48,11 +48,13 @@ Documented patterns of how *this kind of builder* tends to fail under specific c
 
 Drift catalogs are the closest analog to a "playbook" for the auditor. They are written in terms of the role's class (execution-heavy, authoring-heavy, research-heavy, integration-heavy), not the specific project.
 
-### Category D — Self-referential §Audit-Variant clauses
+### Category D — Self-referential auditor-file content
 
-The audit-interpretation clauses authored in the role file's §Audit-Variant section ARE corpus material. They are loaded by the auditor at boot as the auditor's first-line behavioral specification. They are NOT loaded by the builder, even though they live in the same role file, because the builder's session-start load list excludes the §Audit-Variant section.
+The auditor file's own bodies (Operating Rules, Verification of audited role files / per-criterion audit interpretations, Cross-rule audit obligations) ARE corpus material. They are loaded by the auditor at boot as the auditor's first-line behavioral specification. They are NOT loaded by the builder, because under the v0.2.0 separate-file architecture the auditor file lives at a different path (`<audited-role-slug>-auditor.role.md`) and the audited role's session-start load list does not reference it.
 
-This is the lightest-friction asymmetric-corpus mechanism and is required by `auditor-pattern-spec.md`. Adopters cannot opt out of Category D.
+This is the lightest-friction asymmetric-corpus mechanism and is required by `auditor-pattern-spec.md` v0.2.0. Adopters cannot opt out of Category D — the auditor file's own content is corpus material by construction.
+
+> v0.1.x note: under the same-file architecture, Category D was the §Audit-Variant section embedded in the audited role's file. v0.2.0's separate-file architecture relocates the same logical content to the auditor's own file. The category's role is unchanged; the location is.
 
 ### Category E — Project-specific asymmetric materials
 
@@ -90,7 +92,7 @@ audit-corpus/
     └── …
 ```
 
-Category D's directory exists for symmetry and to document the inclusion explicitly; it intentionally contains no files because the materials live in the role file.
+Category D's directory exists for symmetry and to document the inclusion explicitly; it intentionally contains no files because the materials live in the auditor role file (`<audited-role-slug>-auditor.role.md`).
 
 INDEX files are maintained per the project's existing index conventions (typically markdown tables, sorted by date or by rule). Indexes are NOT canonical — they are navigation aids — and may be regenerated from frontmatter.
 
@@ -147,9 +149,9 @@ Findings entries can drive Drift catalog entries (Category A → Category C). Wh
 
 The corpus's value depends on its asymmetry. The discipline that maintains asymmetry:
 
-1. **Builder MUST NOT load the corpus by default.** The builder's session-start load list (per the role's session-context configuration) does not include any `audit-corpus/` paths. This is the primary discipline.
+1. **Builder MUST NOT load the corpus by default.** The audited role's session-start load list does not include any `audit-corpus/` paths AND does not reference the auditor role file (`<audited-role-slug>-auditor.role.md`). This is the primary discipline. Under v0.2.0's separate-file architecture, the prohibition extends to the auditor file itself, because that file's body is Category D corpus material.
 
-2. **Auditor MUST load the corpus by default.** The auditor's session-start load list includes the active entries in all populated categories. Superseded and retracted entries are accessible on demand but not loaded eagerly.
+2. **Auditor MUST load the corpus by default.** The auditor role file's session-start load list includes the audited role file (per `audits:` frontmatter, for domain fluency), upstream governance, and the active entries in all populated corpus categories. Superseded and retracted entries are accessible on demand but not loaded eagerly.
 
 3. **Loading is asymmetric but readable.** The corpus is not hidden — it lives in the project's repository, version-controlled, visible to anyone reading the project. The asymmetry is operational (who loads what at session start), not access-controlled.
 
@@ -238,5 +240,5 @@ Update version and provenance on every change.
 
 ## Provenance
 - source: Initial draft.
-- time: 2026-06-06
-- summary: v0.1.0 — Initial specification of the audit corpus. Defines five entry categories (prior findings, failure post-mortems, drift catalogs, self-referential §Audit-Variant clauses, project-specific materials), default disk layout, entry frontmatter schema, growth rules (entry, supersession, incorporation), access discipline (asymmetric load, visible but not eager-loaded by builder), bootstrapping guidance for v0.1.0-empty corpora, and anti-pattern catalog. Operationalizes Mechanism 2 of auditor-pattern-spec.md v0.1.0. v0.1.1 (2026-06-06) — Adds the `informed` field to the entry frontmatter schema (forward-link from contributing findings to higher-order entries they informed) and a new §"Active-learning hooks" section documenting the machine-readable surfaces, detection-layer signals, promotion-layer hooks, evolution-layer caution, and adopter discipline that produce active-learning-ready corpora today without committing to extension design. Forward-compatible patch; no existing v0.1.0 implementation is invalidated. Active-learning extensions deferred to a future companion specification (anticipated `active-learning-spec.md`) authored when accumulated real corpora provide evidence to design against.
+- time: 2026-06-07
+- summary: v0.1.0 — Initial specification of the audit corpus. Defines five entry categories (prior findings, failure post-mortems, drift catalogs, self-referential §Audit-Variant clauses, project-specific materials), default disk layout, entry frontmatter schema, growth rules (entry, supersession, incorporation), access discipline (asymmetric load, visible but not eager-loaded by builder), bootstrapping guidance for v0.1.0-empty corpora, and anti-pattern catalog. Operationalizes Mechanism 2 of auditor-pattern-spec.md v0.1.0. v0.1.1 (2026-06-06) — Adds the `informed` field to the entry frontmatter schema (forward-link from contributing findings to higher-order entries they informed) and a new §"Active-learning hooks" section documenting the machine-readable surfaces, detection-layer signals, promotion-layer hooks, evolution-layer caution, and adopter discipline that produce active-learning-ready corpora today without committing to extension design. v0.2.0 (2026-06-07) — Relocates Category D's content from the §Audit-Variant section (same-file pattern, v0.1.x) to the auditor role file's own body (separate-file pattern, v0.2.0) to align with `auditor-pattern-spec.md` v0.2.0. Access discipline updated: the "builder MUST NOT load corpus" prohibition extends to the auditor role file itself under v0.2.0, because that file's body is Category D corpus material. Category role unchanged; location is. Other categories (A, B, C, E), entry frontmatter schema, growth rules, and active-learning hooks unchanged from v0.1.1.
