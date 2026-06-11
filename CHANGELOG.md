@@ -2,6 +2,19 @@
 
 All notable changes to Project Prestidigitonium are documented here. Versioning follows semantic versioning per `auditor-pattern-spec.md` §"Versioning."
 
+## [0.2.6] — 2026-06-11
+
+### Origin
+Owner decision following the separate-file architecture's first operational day. The deciding evidence: a separate-file auditor (RoleSmith Auditor) caught its own author reproducing, in a second auditor file, the exact defect class the author had fixed in the first file hours earlier — the correlated-blind-spot failure mode that same-file architecture structurally cannot catch, observed and remediated in production. Supporting evidence from the same day: the detection/maintenance boundary held when the auditor flagged a defect in its own role file without editing it; refutation-framed verdicts produced honest outcomes including a refusal to assert an unverified remediation; the spec→instance→finding→spec loop closed within the day (three v0.2.5 changes trace to instance findings).
+
+### Removed (BREAKING for v0.1.x deployments)
+- **The same-file (v0.1.x) architecture is retired entirely.** The `archive/v0.1.x-same-file-architecture` branch is deleted; v0.1.x is no longer a supported pin point. Content survives in git history for archaeology, not adoption. All "adopters can stay on v0.1.x" language scrubbed from the pattern spec, README, and adoption guide. The adoption guide's §"Migration from v0.1.x" is RETAINED as the supported path for remaining same-file deployments (their extraction source is their own role files, not this repository).
+- Retirement is a support-status change, not a stability claim: the v1.0.0 gate (two independent projects, three months production) is unchanged.
+
+### Changed
+- **Pin-free references convention.** Frontmatter `references:` fields across all sibling specs now name files without versions; current versions live in each file's frontmatter and this CHANGELOG. This applies the drift catalog's own intervention to the repository that catalogs it: version-pinned cross-references produced four maintenance instances across three releases (E2, R2a, R2b, plus the v0.2.5 refresh); the pin-free form removes the drift surface rather than correcting its instances. Exception kept deliberately: the template skeleton's `follows_pattern:` retains its version pin — an adopter's pattern-version declaration is a C-1 conformance surface, not a sibling cross-reference.
+- All sibling specs aligned to version lockstep at 0.2.6.
+
 ## [0.2.5] — 2026-06-11
 
 ### Origin
