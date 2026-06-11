@@ -2,6 +2,16 @@
 
 All notable changes to Project Prestidigitonium are documented here. Versioning follows semantic versioning per `auditor-pattern-spec.md` §"Versioning."
 
+## [0.4.0] — 2026-06-11
+
+### Origin
+Owner directive: make inter-role monitoring token-efficient — cost scaling with events, not time — without the owner re-spinning monitors. The design went through a full adversarial review by a running auditor instance over the mail system itself before any spec text was written (`2026-06-11-design-review-findings-watch-economy`, six findings); the two structural refutations reshaped the design.
+
+### Added
+- **Watch-economy section in `comms-spec.md` (v0.4.0).** Reader-owned cursors (`.comms/cursors/<role-slug>`) — the reviewer's inversion of the proposed writer-maintained sentinel: the head is derivable from the directory, atomic with filing; the cursor is the reader state that died with sessions; single-author by construction, no co-edited file; a writer-maintained freshness signal is rejected as a claim batched with the filing act and unconditioned on it. Watch-lifetime rule: session-long by default; thread-scoped watches permitted **only as a package with the scheduled wake companion** (archive evidence showed auto-disarm alone reinstates the owner as scheduler and orphans quiet-period mail for low-cadence pairs). Commit-signal hooks (`post-commit` + `post-merge` touching `.comms/.commit-signal`) with honest event scope (fetch-plus-reset fires neither), setup-duty installation, session-start presence check (hook absence becomes a conformance fact, not config faith), and the latency-only claim: delivery still verifies at the ref; signal absence is evidence of nothing.
+- **Rule 7: the id's date is a claim** — verify against the clock at filing; misdated ids correct by follow-up message, never rename. Precedent: two independent misdated-id instances in one day, one per party.
+- **Template skeleton (v0.3.2)** comms clauses aligned (watch-lifetime reference, cursor update, hook installation + presence check in the duties). **Adoption guide** Step 9 wording aligned and made version-free. No criteria changes; C-22's duty enumeration covers the extended duties by reference to the spec.
+
 ## [0.3.1] — 2026-06-11
 
 ### Added
