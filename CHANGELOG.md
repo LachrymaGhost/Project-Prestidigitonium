@@ -2,6 +2,29 @@
 
 All notable changes to Project Prestidigitonium are documented here. Versioning follows semantic versioning per `auditor-pattern-spec.md` §"Versioning."
 
+## [0.2.3] — 2026-06-11
+
+### Origin
+All items in this release originate from an ASA fresh-pass self-review of v0.2.2. The headline observation: **the stale-reference defect class that v0.2.2 fixed (E1–E3) recurred inside v0.2.2 itself** — two reference fields the release touched around but did not update, plus counts and a contradiction the new Step 8 invalidated. Five same-shape instances now observed (E1, E2, E3, R2×2), which crosses the corpus spec's own three-instance threshold for naming a Category C drift pattern; adopting corpora should seed "stale cross-references after multi-file revision" as their first drift-catalog entry. v0.2.0-conformant implementations remain conformant under v0.2.3; no Required criteria added or changed.
+
+### Fixed (errata)
+- **R1 — README contradicted Step 8.** The README stated the pattern is "operational the moment the auditor file lands and the corpus tree exists" — directly contradicting v0.2.2's Step 8, which established that an adoption with unwired routing sits inert. README also still said "Seven-step walkthrough" / "Seven steps" (the guide has nine), its adoption summary had no routing step, and its conformance-criteria line said twenty criteria / three Recommended. All corrected; the adoption summary now carries the routing condition explicitly.
+- **R2 — E2's defect class recurred in two files.** `adoption-guide.md` frontmatter `references:` still pinned all three siblings at v0.2.0; `template-auditor-role-file.md`'s outer frontmatter `references:` still pinned `auditor-pattern-spec.md v0.2.0`. Both corrected to current versions.
+- **R3 — Stale criterion count in Step 8.** "None of the nineteen conformance criteria" was off by one at landing (C-20 shipped in the same release). Replaced with count-free phrasing, since embedded counts are themselves an instance of the drift class this release documents.
+- **R4 — C-20 filed out of order and orphaned from the review procedure.** C-20 physically preceded C-19 in `conformance-criteria.md`, and the review procedure's closing line still read "Recommended criteria (C-18, C-19)." Numerical order restored; closing line now reads C-18 through C-21.
+
+### Added
+- **`audits_version:` interpretation pinning + Criterion C-21 (Recommended).** The `audits:` pointer is path-level only: when the audited role bumps its version and renumbers or revises its checks, the auditor's per-criterion interpretations silently drift out of correspondence, detectable only when a full C-10 review happens to run. The auditor now pins the audited-role version its interpretations target (`audits_version:` frontmatter) and compares it against the audited role's current version at session start, flagging staleness before any verdict. Template skeleton, Operational Constraints, annotated guidance, adoption guide Step 6, and checklist updated. Follows the C-20 precedent of landing Recommended criteria in a patch release.
+- **Structured finding schema + Category A mapping.** The template's Outputs findings-list entry expanded into a named-field schema (`id`, `check`, `proposition`, `derived`, `observed`, `result`, `citation`, `corpus_refs`) that maps field-for-field onto Category A corpus entry frontmatter per the corpus spec's new §"From finding to entry." Closes the previously undefined gap between "auditor MAY draft a candidate Category A entry" and the entry schema — promotion is now mechanical, and future active-learning Layer 1 tooling gets a parseable verdict-to-corpus trail. The schema also disambiguates the `result` vocabulary: the result names the fate of the conformance proposition, not the refutation attempt.
+- **Inconclusive-density verdict guidance.** Check-level `inconclusive` results had no implementation-level grading consequence. New convention: a verdict resting on more than roughly a quarter inconclusive checks SHOULD grade no higher than CONFORMANT WITH NOTES, with notes enumerating each inconclusive check and the evidence that would resolve it.
+
+### References updated
+- `adoption-guide.md` frontmatter `references:` → `auditor-pattern-spec.md v0.2.2, template-auditor-role-file.md v0.2.3, audit-corpus-spec.md v0.2.3`
+- `template-auditor-role-file.md` frontmatter `references:` → `auditor-pattern-spec.md v0.2.2`
+- `conformance-criteria.md` frontmatter `references:` → `auditor-pattern-spec.md v0.2.2, template-auditor-role-file.md v0.2.3, audit-corpus-spec.md v0.2.3`
+- `template-auditor-role-file.md` skeleton `follows_pattern:` → `Project Prestidigitonium v0.2.3`
+- `auditor-pattern-spec.md` unchanged at v0.2.2 (no content changes this release).
+
 ## [0.2.2] — 2026-06-07
 
 ### Origin

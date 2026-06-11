@@ -1,11 +1,11 @@
 ---
 name: conformance-criteria
-version: 0.2.2
+version: 0.2.3
 status: draft
 license: Apache-2.0
 maintained_by: Aire System Architect (ASA)
 domain_tags: [conformance, audit, governance]
-references: auditor-pattern-spec.md v0.2.2, template-auditor-role-file.md v0.2.2, audit-corpus-spec.md v0.2.2
+references: auditor-pattern-spec.md v0.2.2, template-auditor-role-file.md v0.2.3, audit-corpus-spec.md v0.2.3
 ---
 
 # Conformance Criteria
@@ -168,6 +168,14 @@ A conformant implementation passes all criteria marked **Required**. **Recommend
 
 **Failure.** Sampled entries missing required frontmatter fields.
 
+## Criterion C-19 (Recommended) — Post-mortem incorporation traceable
+
+**What is checked.** If any Category B post-mortem has `status: incorporated`, the corresponding change to the auditor role file's audit interpretations or cross-rule obligations is locatable by reference.
+
+**How it is checked.** Sample incorporated post-mortems; for each, locate the corresponding clause change in the auditor file's version history or in the post-mortem's "incorporated by" reference.
+
+**Failure.** Incorporated post-mortems exist but the auditor-file changes they drove cannot be located.
+
 ## Criterion C-20 (Recommended) — Audit posture declared explicitly
 
 **What is checked.** The auditor file's frontmatter contains an `audit_posture` field with one of the three valid values (`artifact-verdict-only`, `continuous-monitoring`, `hybrid`), and the body contains a corresponding "Audit posture declaration" section naming the chosen posture.
@@ -178,13 +186,15 @@ A conformant implementation passes all criteria marked **Required**. **Recommend
 
 > Note: under v0.2.2, auditors that fail to declare a posture default to `artifact-verdict-only` per the template's graceful-default rule. Absence is therefore not a *Required* defect — the implementation remains operationally usable — but explicit declaration prevents the posture from being ambiguous to downstream readers, and is therefore Recommended.
 
-## Criterion C-19 (Recommended) — Post-mortem incorporation traceable
+## Criterion C-21 (Recommended) — Audited-role version pinned and current
 
-**What is checked.** If any Category B post-mortem has `status: incorporated`, the corresponding change to the auditor role file's audit interpretations or cross-rule obligations is locatable by reference.
+**What is checked.** The auditor file's frontmatter contains an `audits_version:` field naming the version of the audited role file its per-criterion audit interpretations were authored against, and that version matches the audited role file's current frontmatter `version`.
 
-**How it is checked.** Sample incorporated post-mortems; for each, locate the corresponding clause change in the auditor file's version history or in the post-mortem's "incorporated by" reference.
+**How it is checked.** Parse both files' YAML frontmatter; confirm `audits_version:` is present in the auditor file; compare its value to the audited role file's current `version` field. Read the auditor file's Operational Constraints for the session-start staleness comparison.
 
-**Failure.** Incorporated post-mortems exist but the auditor-file changes they drove cannot be located.
+**Failure.** `audits_version:` field absent; or field present but mismatched against the audited role's current version with no staleness acknowledgment in the auditor file's most recent provenance entry.
+
+> Note: Recommended rather than Required because the path-level `audits:` pointer (C-1) already establishes the audit relationship. The version pin protects against a failure C-1 cannot see: the audited role bumps its version, renumbers or revises its checks, and the auditor's interpretations silently drift out of correspondence. Without the pin, that drift surfaces only when a full C-10 correspondence review happens to run; with it, every auditor session detects the mismatch at load time.
 
 ## Conformance verdict structure
 
@@ -197,6 +207,8 @@ A conformance verdict is one of:
 
 The thresholds are conventions, not absolutes. A single Required failure on a load-bearing criterion (C-1, C-2, C-4, C-6, C-10, C-11, C-16, C-17) is operationally more serious than three failures on procedural criteria. A verdict should explain its grading; categorical labels are summaries, not substitutes for the narrative.
 
+Check-level `inconclusive` results require their own handling in grading. An implementation-level verdict resting on a substantial fraction of inconclusive checks (as a convention, more than a quarter of the checks reviewed) is weak evidence regardless of how few checks failed outright, and SHOULD be graded no higher than CONFORMANT WITH NOTES — with the notes enumerating each inconclusive check and the specific evidence that would resolve it. Inconclusiveness is not failure, but a verdict that cannot establish most of what it set out to establish should not present itself as clean.
+
 ## Performing a conformance review
 
 A conformance review proceeds in three passes:
@@ -207,7 +219,7 @@ A conformance review proceeds in three passes:
 
 3. **Clause pass** — confirm C-10 through C-14, C-16 (per-criterion clauses + relational primitives + audited-role load discipline). Highest-volume criteria; review proceeds by sampling for projects with 10+ checks in the audited role.
 
-Recommended criteria (C-18, C-19) are reviewed last.
+Recommended criteria (C-18 through C-21) are reviewed last.
 
 ## Self-conformance of this specification
 
@@ -220,4 +232,4 @@ Update version and provenance on every change.
 ## Provenance
 - source: Major revision per architectural inversion from same-file (v0.1.x) to separate-file (v0.2.0).
 - time: 2026-06-07
-- summary: v0.2.0 — Rewritten conformance criteria for the separate-file architecture. v0.1.x's sixteen criteria (centered on §Audit-Variant section presence and structure) replaced with nineteen criteria (seventeen Required, two Recommended) centered on separate-file topology: auditor file existence + canonical naming + correct frontmatter (C-1); reciprocal `audited_by:` pointer in audited role (C-2); base-role-template structure in auditor file (C-3); authority chain + upstream governance + adversarial default + re-derivation + authority precedence + scope limits (C-4 to C-9); per-criterion clauses + refutation framing + concrete mechanisms + cross-rule obligations (C-10 to C-13); all six relational primitives through audit lens (C-14); corpus tree (C-15); audited-role load list excludes both corpus AND auditor file (C-16); absence of §Audit-Variant in audited role (C-17); corpus frontmatter discipline + post-mortem incorporation traceability (C-18, C-19 Recommended). Three-pass review procedure updated. Load-bearing criteria called out (C-1, C-2, C-4, C-6, C-10, C-11, C-16, C-17). v0.2.2 (2026-06-07) — Adds Criterion C-20 (Recommended) for explicit `audit_posture` declaration in auditor file frontmatter and body, per the template's new posture-declaration mechanism (artifact-verdict-only / continuous-monitoring / hybrid). Absence is not a Required defect because v0.2.2's template specifies a graceful default to `artifact-verdict-only`, but explicit declaration prevents downstream ambiguity. References field updated to v0.2.2 across all three sibling specs. No Required criteria changed; v0.2.0-conformant implementations remain conformant under v0.2.2.
+- summary: v0.2.0 — Rewritten conformance criteria for the separate-file architecture. v0.1.x's sixteen criteria (centered on §Audit-Variant section presence and structure) replaced with nineteen criteria (seventeen Required, two Recommended) centered on separate-file topology: auditor file existence + canonical naming + correct frontmatter (C-1); reciprocal `audited_by:` pointer in audited role (C-2); base-role-template structure in auditor file (C-3); authority chain + upstream governance + adversarial default + re-derivation + authority precedence + scope limits (C-4 to C-9); per-criterion clauses + refutation framing + concrete mechanisms + cross-rule obligations (C-10 to C-13); all six relational primitives through audit lens (C-14); corpus tree (C-15); audited-role load list excludes both corpus AND auditor file (C-16); absence of §Audit-Variant in audited role (C-17); corpus frontmatter discipline + post-mortem incorporation traceability (C-18, C-19 Recommended). Three-pass review procedure updated. Load-bearing criteria called out (C-1, C-2, C-4, C-6, C-10, C-11, C-16, C-17). v0.2.2 (2026-06-07) — Adds Criterion C-20 (Recommended) for explicit `audit_posture` declaration in auditor file frontmatter and body, per the template's new posture-declaration mechanism (artifact-verdict-only / continuous-monitoring / hybrid). Absence is not a Required defect because v0.2.2's template specifies a graceful default to `artifact-verdict-only`, but explicit declaration prevents downstream ambiguity. References field updated to v0.2.2 across all three sibling specs. No Required criteria changed; v0.2.0-conformant implementations remain conformant under v0.2.2. v0.2.3 (2026-06-11) — Per ASA fresh-pass review: restores numerical ordering of the Recommended criteria (C-20 had been filed before C-19 in v0.2.2) and adds C-20/C-21 to the review-procedure closing line, which still read "C-18, C-19" after C-20 landed. Adds Criterion C-21 (Recommended) for `audits_version:` interpretation pinning — the auditor declares which version of the audited role file its per-criterion interpretations target, detecting silent interpretation drift at session start rather than waiting for a full C-10 correspondence review. Adds inconclusive-density guidance to the verdict structure: verdicts resting on more than roughly a quarter inconclusive checks SHOULD grade no higher than CONFORMANT WITH NOTES. Follows the C-20 precedent of landing Recommended criteria in a patch release; no Required criteria changed; v0.2.0-conformant implementations remain conformant under v0.2.3.
