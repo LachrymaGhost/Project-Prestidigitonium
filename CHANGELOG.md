@@ -2,6 +2,11 @@
 
 All notable changes to Project Prestidigitonium are documented here. Versioning follows semantic versioning per `auditor-pattern-spec.md` §"Versioning."
 
+## [0.4.2] — 2026-06-11
+
+### Changed
+- **`follows_pattern:` pin semantics: the pin declares the conformed version** (template v0.3.4 guidance; C-1 check refined at conformance-criteria v0.3.1). Owner-ratified resolution of the design fork the RoleSmith Auditor's P3 flag made explicit: the v0.4.0 re-pin wave itself shipped as release v0.4.1, staling both instance pins at the moment of their repair — under tracks-latest semantics, the treadmill's repair *was* the treadmill. Under conformed-version semantics the pin is stale only when a later release changes a surface the instance must conform to; content-irrelevant releases (this one included) stale nothing. Existing instance pins at v0.4.0 are conformant with no edits required.
+
 ## [0.4.1] — 2026-06-11
 
 ### Fixed
