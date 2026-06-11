@@ -2,6 +2,12 @@
 
 All notable changes to Project Prestidigitonium are documented here. Versioning follows semantic versioning per `auditor-pattern-spec.md` §"Versioning."
 
+## [0.2.4] — 2026-06-11
+
+### Added
+- **Model-diversity deployment recommendation** (README new section + adoption guide Step 8 note + checklist item). The separate-file architecture removes shared source text between builder and auditor; it does not remove shared priors — same-model builder/auditor pairs share training-shaped reasoning tendencies that survive every file boundary. Recommendation, in priority order: (1) run the auditor on a **different model** than the builder; (2) **capability floor** — the auditor's model is at least as capable as the builder's, never weaker (a weaker auditor manufactures the capability blind spots the pattern names as unsolved); (3) **elevated thinking tier** for the auditor as a complement on top of model diversity, or as a fallback when only one model is available — tier elevation improves thoroughness within the same lens (mitigates sustained-load attention failures) but does not decorrelate priors. Specific model names are pinned, dated, in the adopting project's auditor file (Operational Constraints), not in this spec — naming models normatively in a domain-agnostic spec is an instance of the stale-reference drift class this project catalogs. Empirical basis: the v0.2.3 errata were caught by re-reviewing v0.2.2's artifacts on a different model than the one that authored them.
+- Like routing (Step 8), model selection is invocation-environment configuration invisible to file-level conformance review; no conformance criteria added or changed. v0.2.0-conformant implementations remain conformant under v0.2.4.
+
 ## [0.2.3] — 2026-06-11
 
 ### Origin
