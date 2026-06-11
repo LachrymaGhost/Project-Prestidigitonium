@@ -2,6 +2,20 @@
 
 All notable changes to Project Prestidigitonium are documented here. Versioning follows semantic versioning per `auditor-pattern-spec.md` §"Versioning."
 
+## [0.2.5] — 2026-06-11
+
+### Origin
+First lessons from running instances, all sourced from the RoleSmith Auditor's first operational day (smoke test through first cross-project verdict) and the owner's deployment observations. The pattern's feedback loop is now real: an instance audited another instance, the findings came home, and the generalizable parts land here.
+
+### Added
+- **C-21 multi-file rule-source note** (`conformance-criteria.md` v0.2.5). When an auditor's interpretations target rule units in files other than the pinned master (module specs under a master role file), the single `audits_version:` pin can match while the targeted files drift — coverage is conventional, not mechanical. Auditors in that topology SHOULD enumerate targeted files in their staleness clause and treat targeted-file version changes as staleness. Multi-pin map form deferred to v0.3.0. Source: RoleSmith Auditor's verdict on the Deep Thought Auditor (note 2), promoted upstream by owner decision in lieu of a local corpus entry.
+- **Availability-window deployment point** (README §Model diversity, point 5). A pinned model with a known access expiry is a staleness with a date: state the window and the planned post-expiry pairing in the clause, converting discovered drift into a scheduled transition. Source: owner's observation that a current pairing's model is billing-limited to a known date neither pin had recorded.
+- **Cause-over-output authoring rule for drift catalogs** (`audit-corpus-spec.md` v0.2.5, Category C). Drift-pattern fields SHOULD name the causal mechanism, not only the observed output — "edits update the target line and never re-read its neighbors" produces an intervention (pin-free phrasing); "references go stale" produces only vigilance. Source: instance four of the stale-cross-references class, a version pin that survived three revisions because it sat one line below the edits ("proximity without participation").
+
+### References updated
+- `conformance-criteria.md` and `adoption-guide.md` references fields → `audit-corpus-spec.md v0.2.5` (adoption-guide v0.2.5 is references-only).
+- No criteria added or changed; v0.2.0-conformant implementations remain conformant under v0.2.5.
+
 ## [0.2.4] — 2026-06-11
 
 ### Added
