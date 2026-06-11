@@ -2,6 +2,11 @@
 
 All notable changes to Project Prestidigitonium are documented here. Versioning follows semantic versioning per `auditor-pattern-spec.md` §"Versioning."
 
+## [0.3.1] — 2026-06-11
+
+### Added
+- **Trigger-source provision in the `artifact-verdict-only` posture** (`template-auditor-role-file.md` v0.3.1). Verdicts may fire on request or — when the owner directs it — on artifact events (work-surface file watches; a file event is an audit trigger, nothing more). Event triggering changes *when* audits fire, never *how* they read: the cold-context discipline holds per verdict regardless of trigger source, so the posture value is unchanged by event triggering. Comms participation is explicitly not monitoring. Origin: an owner-directed artifact watch landed on a running instance the same day; the instance operated under owner authority while logging the uncodified extension as a divergence record — the gap closed instance-first (both running instances), template-second (here). No criteria changes.
+
 ## [0.3.0] — 2026-06-11
 
 ### Origin
