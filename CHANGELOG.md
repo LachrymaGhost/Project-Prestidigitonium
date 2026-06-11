@@ -2,6 +2,11 @@
 
 All notable changes to Project Prestidigitonium are documented here. Versioning follows semantic versioning per `auditor-pattern-spec.md` §"Versioning."
 
+## [0.4.1] — 2026-06-11
+
+### Fixed
+- **Template skeleton `follows_pattern:` example advanced to v0.4.0** (template v0.3.3). It had regressed to two releases stale (v0.3.0) — repeating the exact history the v0.3.0 entry documents. Surfaced when a running instance (Deep Thought Auditor) flagged the identical stale pin in its own file; disposed by enumeration across all three pin surfaces (both running auditor instances re-pinned in their own provenance, this skeleton here). The deliberate-pin maintenance recurring as designed, second documented cycle.
+
 ## [0.4.0] — 2026-06-11
 
 ### Origin
