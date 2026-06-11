@@ -2,6 +2,21 @@
 
 All notable changes to Project Prestidigitonium are documented here. Versioning follows semantic versioning per `auditor-pattern-spec.md` §"Versioning."
 
+## [0.3.0] — 2026-06-11
+
+### Origin
+Owner direction to standardize the builder↔auditor mail system that ran operationally in two projects (the Aire RoleSmith pair and the Sketch Builder/Auditor lanes) before being specified here — the reverse of the usual order, and the healthier one: the spec describes a system with an operational day behind it, including a full finding→remediation→verification→promotion lifecycle carried entirely over mail.
+
+### Added
+- **`comms-spec.md` (new sibling spec).** Message-per-file inboxes; immutable messages with reply-link state and thread closure; session-start read-then-arm discipline (persistent inbox watches — the harness wakes the role, removing mid-session human relaying); the corpus boundary (mail is not corpus; C-16 undisturbed); pin-free body practice; multi-writer filename variant and incremental-migration seam for multi-role projects. Design premise stated up front: a role cannot wake itself, but it can arm things that wake it.
+- **Auditor-owned setup with the activation-directive bootstrap.** Standing the channel up is the auditor's first-boot duty: create the tree, file the activation directive into the builder's inbox — the channel's first message is the builder's operating manual. The builder's session-entry configuration (CLAUDE.md or equivalent) carries only a one-line bootstrap pointer, added during the routing step — resolving the chicken-and-egg (mail cannot teach a builder to read mail) while preserving Step 7's single-required-edit property for the audited role file. Embedding comms discipline in the audited role file is optional hardening.
+- **Auditor-owned housekeeping, self-triggering.** Threshold sweep (>20 files → relocate answered mail except the 10 newest to archive), relocation-only (immutability survives archiving), unanswered mail never archives, sweep notices as the log, move-safe id resolution. The duty rides the session-start read; no human prompts it.
+- **Adoption guide Step 9** (comms wiring; Surface renumbered to Step 10; checklist extended). **Template skeleton** gains the comms discipline and setup/housekeeping duty clauses plus the verdict-destination update. **Criterion C-22 (Recommended)**: comms channel established per comms-spec — Recommended because the pattern functions with owner-relayed verdicts; the channel removes the human relay.
+- **Pattern spec**: `.comms/` row added to the file-relationship topology; **corpus spec**: mail-is-not-corpus stated as access-discipline rule 6.
+
+### Changed
+- All sibling specs aligned at 0.3.0 lockstep. `follows_pattern:` example pins in the template skeleton and guide Step 6 updated to v0.3.0 (they had sat at v0.2.3 for three releases — the deliberate-pin exception is recurring maintenance by design, and it recurred).
+
 ## [0.2.6] — 2026-06-11
 
 ### Origin
