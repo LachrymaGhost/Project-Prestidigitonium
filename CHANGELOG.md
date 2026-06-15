@@ -2,6 +2,21 @@
 
 All notable changes to Project Prestidigitonium are documented here. Versioning follows semantic versioning per `auditor-pattern-spec.md` §"Versioning."
 
+## [0.5.3] — 2026-06-15
+
+### Origin
+Owner directive after a running auditor instance self-flagged a stale model pin: a deployed auditor file still named its model (Fable 5) as current after that model was withdrawn earlier than its announced 2026-06-23 window. Rather than patch the instance, fix the *source* so future auditor roles don't carry the brittle form — "suggest using the preferred model if it's accessible, otherwise defer automatically to the most current version of the leading model with the most appropriate settings."
+
+### Changed
+- **The model-diversity deployment recommendation is now a self-healing standing rule** (`README.md` §"Deployment recommendation: model diversity"; `adoption-guide.md` v0.3.3 note + checklist; `template-auditor-role-file.md` v0.3.6 skeleton). Prior guidance told adopters to record a *dated hard-pin* of the builder/auditor model pairing — which went stale in running instances when a preferred model was withdrawn before its announced window, leaving auditor files naming a model no longer available. The recommendation now reads: state a *preferred* pairing and use it whenever accessible; when a preferred model is unavailable, **auto-defer to the most current leading model available at the most appropriate settings** rather than carrying a stale name; re-pin only when the model or effort/method assignment materially changes.
+
+### Added
+- **The same-model decorrelation mechanism: effort/method asymmetry.** When model diversity is temporarily impossible (only one model available), decorrelation rests on the separate-context / separate-file / asymmetric-corpus separation **plus an effort/method asymmetry** — the auditor runs at a higher effort/method tier than the builder (elevated thinking tier; multi-agent adversarial orchestration where available), holding the capability floor by *method* rather than model tier, never by downgrading the builder. Codified from a running pair that landed on a single model after an early model withdrawal and held decorrelation this way.
+- **`template-auditor-role-file.md` v0.3.6** — the skeleton's Operational Constraints gains a model/method-pairing clause in the self-healing form, so every newly generated auditor role starts with the auto-deferring rule rather than a brittle dated name. `follows_pattern:` example unchanged: model/method pairing is a Recommended deployment rec, not a conformance criterion or other conformed surface, so advancing the pin would be the re-pin treadmill this kit retired (v0.4.2 pin semantics).
+
+### Retained unchanged
+- No conformance-criteria or message-protocol changes; all v0.5.x channels and existing instances remain conformant (C-22/C-23 unaffected). Existing auditor instances carrying a dated pin are not non-conformant — they adopt the self-healing phrasing at their next role-file revision.
+
 ## [0.5.2] — 2026-06-15
 
 ### Added
