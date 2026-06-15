@@ -2,6 +2,11 @@
 
 All notable changes to Project Prestidigitonium are documented here. Versioning follows semantic versioning per `auditor-pattern-spec.md` §"Versioning."
 
+## [0.5.2] — 2026-06-15
+
+### Added
+- **`comms-spec.md` v0.5.2 — §Activation backstop: the per-turn unread hook.** A `UserPromptSubmit` hook (reference helper `.comms/bin/comms-unread-banner`) injects the **cursor-delta** unread count (never inbox file-count — immutable mail never leaves the inbox) into the agent's context **every turn**, so an agent notices waiting mail at the next turn boundary **regardless of whether the activation loop is running** — the structural backstop for "a signed mechanism not running protects nothing" (a running auditor with `comms-wait` down missed mail ~20 min and misdiagnosed who was behind). Fires at the turn boundary (mid-turn ingest is the honest structural limit); composes with `heartbeat wait` (between-turn re-invoke) as belt + suspenders. Reference helper is slug-agnostic (zero-config, all inboxes) or slug-scoped per session (settings-isolated); read-only, exit-0-advisory, silent-when-clear. The per-turn unread *surface* moves from §"does not cover" to a provision; the **wake-on-arrival hook** (waking a *live* session mid-task) remains the harness boundary. No message-protocol or criteria changes; v0.5.x channels remain conformant.
+
 ## [0.5.1] — 2026-06-15
 
 ### Changed
