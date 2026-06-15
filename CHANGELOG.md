@@ -2,6 +2,11 @@
 
 All notable changes to Project Prestidigitonium are documented here. Versioning follows semantic versioning per `auditor-pattern-spec.md` §"Versioning."
 
+## [0.5.1] — 2026-06-15
+
+### Changed
+- **`comms-spec.md` v0.5.1 — §Activation: poll interval COLLAPSED to a single uniform low rate** (default ~5s, hard-max-clamped), replacing v0.5.0's "bounded-adaptive tight/rest" language. Per the running auditor's triangulated refutation of the prior adaptive design: the split's receiver-side tight-entry was never built (the in-flight marker had no runtime writer — only the selftest sets it), so the only live effect was the idle rate; polling is ~free (pure bash, no model tokens), so a uniform low rate dominates on cost + simplicity. **Surgical** — only the cadence branch was removed from the reference `cb_wait_interval`; the in-flight marker is retained for its other two consumers (the teardown-refusal guard + the health-line observability), enumerated and verified before the delete. Reference selftest gains an `interval-uniform-ignores-marker` regression guard; reproduced GREEN by the auditor. No message-protocol or criteria changes; v0.5.0 channels remain conformant.
+
 ## [0.5.0] — 2026-06-15
 
 ### Origin
