@@ -2,6 +2,22 @@
 
 All notable changes to Project Prestidigitonium are documented here. Versioning follows semantic versioning per `auditor-pattern-spec.md` §"Versioning."
 
+## [0.5.0] — 2026-06-15
+
+### Origin
+Owner directive: make the builder↔auditor comms reliable "from the start, every single time." The reliability layer was built and proven on a running pair (brainstorm→design→M1 CONFORMANT→M2 reliability-signed→cross-death closure), each gate independently reproduced by the running auditor instance, and deployed live before the spec text was written — the proven-then-specified order this kit prefers. An **evolution of one layer** of `comms-spec.md`, not a rework: the message protocol is unchanged.
+
+### Added
+- **`comms-spec.md` v0.5.0 — §Reliability** (evolves the v0.4.0 watch economy). Liveness by heartbeat **age** (a passive stamp, never process-presence — no "who watches the watcher"); the reader cursor gains an authoritative processed-**set** (`cursors/<slug>.done`) so *unread* is an order-independent set difference advancing on **action, not receipt** (no message lost — level-triggered). A unified self-locating command surface: `up` (idempotent self-verifying singleton/detached bring-up), `wait` (encoded bounded-adaptive in-session activation), `down` (by-PID teardown + stand-down marker), `doctor`/`status` (marker-first LIVE/DORMANT/DEGRADED), **`wake`** (stateless out-of-process cross-death closure), **`selftest`** (the deterministic failure-injection suite — reliability as a *falsifiable* property, identical-GREEN over N runs). Premises 4-5 (liveness-by-age; no-message-lost) and the command-surface contract added. The cross-session wake **trigger** and its **project list** are deployment-local and explicitly NOT part of the kit (private projects are never named in a shared spec).
+- **`conformance-criteria.md` v0.3.2 — Criterion C-23 (Recommended)**: comms reliability provisions adopted and proven (command surface present; `heartbeat selftest` reproducibly identical-GREEN; liveness-by-age; single honest heartbeat writer). Recommended because the channel (C-22) functions without the reliability layer; the layer hardens unattended / at-scale pairs.
+
+### Superseded
+- **Commit-signal hooks** (comms-spec v0.4.0) — liveness-by-age plus the level-triggered durable cursor make a commit file-event unnecessary; retained-optional, no longer a spec provision.
+- **The scheduled wake companion** (comms-spec v0.4.0) — generalized into the liveness-aware `heartbeat wake` (fires only on a true stall, not on every unprocessed message).
+
+### Retained unchanged
+- The message protocol: message-per-file inboxes, immutability, reply-link state, thread closure, corpus boundary, the finding schema, housekeeping. Backward-compatible — v0.4.0 channels remain conformant (C-22), gaining C-23 only where the reliability layer is adopted.
+
 ## [0.4.2] — 2026-06-11
 
 ### Changed
