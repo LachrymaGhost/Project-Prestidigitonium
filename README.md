@@ -17,6 +17,7 @@ The pattern drops into existing role-based systems as a **separate auditor role 
 | `audit-corpus-spec.md` | Structure, growth rules, and access discipline for the asymmetric corpus — the body of materials the auditor loads but the audited role does not. Includes active-learning hooks (forward-compatible). |
 | `adoption-guide.md` | Step-by-step walkthrough from "role file with rules" to "conformant, correctly-routed, mail-connected auditor alongside it." Includes CLAUDE.md routing strategies and a Migration from v0.1.x section. |
 | `comms-spec.md` | Builder↔auditor mail: message-per-file inboxes, immutable messages with reply-link state, auditor-owned setup + self-triggering housekeeping, and **§Reliability** — liveness-by-age, the `.done` cursor-set (no message lost), the `heartbeat` command surface (`up`/`wait`/`wake`/`down`/`doctor`/`status`/`selftest`) with a deterministic self-test as its falsification instrument, and a per-turn unread hook so a busy agent reliably notices waiting mail. |
+| `comms-bringup-directive.md` | The ordered, idempotent, gate-verified procedure for standing the builder↔auditor comms channel up **correct the first time** — the operational expansion of `adoption-guide.md` Step 9. A seven-check verification gate proves the channel *delivers, surfaces, gets read/replied, advances a cursor, and wakes a heads-down agent* before work begins (file-existence ≠ a working channel). |
 | `conformance-criteria.md` | Twenty-three criteria (seventeen Required, six Recommended) for verifying an implementation realizes the pattern. Includes verdict structure and review procedure. |
 | `CHANGELOG.md` | Full version history. |
 | `LICENSE` | Apache 2.0. |
@@ -67,7 +68,7 @@ This is governance-pattern material, not project-specific code. Publishing it st
 6. Create an `audit-corpus/` tree at the project root. Empty is a conformant state.
 7. Bump both files' versions and update their provenance.
 8. Wire project-harness routing (CLAUDE.md or equivalent) so auditor invocations bind to the auditor file — and smoke-test it.
-9. Add the one-line mail bootstrap pointer to the builder's session-entry config; the auditor's first boot creates `.comms/` and files the activation directive.
+9. Add the one-line mail bootstrap pointer to the builder's session-entry config; the auditor's first boot creates `.comms/` and files the activation directive. For a correct-first-time bring-up, follow `comms-bringup-directive.md` — the ordered two-party sequence and its seven-check verification gate (prove the channel works; don't declare it done on file-existence).
 10. Run a conformance check against `conformance-criteria.md`.
 
 Nothing executes; no new infrastructure spins up. The pattern is operational once the auditor file lands, the corpus tree exists, **and** harness routing binds auditor invocations to the auditor file — the one condition file-level review cannot see (an unwired adoption looks conformant while every "audit" silently anchors to the builder's own file).
@@ -86,14 +87,14 @@ Like CLAUDE.md routing, model selection is invocation-environment configuration 
 
 ## Status and stability
 
-**Current: v0.5.3, status: draft.** The pattern is internally consistent and operationally complete — it can be adopted today — and has run in production across multiple projects, accumulating the running-instance lessons that shaped v0.2 through v0.5. Corpus-population conventions will keep sharpening as real instances accumulate findings.
+**Current: v0.5.4, status: draft.** The pattern is internally consistent and operationally complete — it can be adopted today — and has run in production across multiple projects, accumulating the running-instance lessons that shaped v0.2 through v0.5. Corpus-population conventions will keep sharpening as real instances accumulate findings.
 
 What each release line added (one line each; **full detail in [`CHANGELOG.md`](CHANGELOG.md)**):
 
 - **v0.2.x** — the separate-file architecture; the model-diversity deployment recommendation; the first running-instance lessons. The same-file form was retired on first-operational-day evidence.
 - **v0.3.x** — the **comms layer** (`comms-spec.md`): builder↔auditor mail, auditor-owned setup + housekeeping, the activation-directive bootstrap, Criterion C-22.
 - **v0.4.x** — the watch economy, plus conformed-version pin semantics (ending the every-release re-pin treadmill).
-- **v0.5.x** — the **reliability layer** (Criterion C-23): liveness-by-age; the no-message-lost `.done` cursor; the unified `heartbeat` command surface and its deterministic self-test; the poll collapsed to a uniform low rate; and a per-turn unread hook so a busy agent notices waiting mail even when the activation loop is down. Here reliability is a *falsifiable* property — the self-test must be identical-GREEN over N runs, not merely observed working once. v0.5.3 adds the **self-healing model/method-pairing recommendation** — prefer a distinct model when accessible; auto-defer to the most current leading model otherwise; an effort/method asymmetry holds the capability floor when only one model is available.
+- **v0.5.x** — the **reliability layer** (Criterion C-23): liveness-by-age; the no-message-lost `.done` cursor; the unified `heartbeat` command surface and its deterministic self-test; the poll collapsed to a uniform low rate; and a per-turn unread hook so a busy agent notices waiting mail even when the activation loop is down. Here reliability is a *falsifiable* property — the self-test must be identical-GREEN over N runs, not merely observed working once. v0.5.3 adds the **self-healing model/method-pairing recommendation** — prefer a distinct model when accessible; auto-defer to the most current leading model otherwise; an effort/method asymmetry holds the capability floor when only one model is available. v0.5.4 adds **`comms-bringup-directive.md`** — the ordered, gate-verified comms bring-up procedure (a seven-check gate that proves delivery, the per-turn surface, *and* the autonomous heads-down wake all fire before work begins), operationalizing `adoption-guide.md` Step 9 and the deployment-layer wake-on-arrival the reliability layer left to the harness.
 
 Versioning policy: `auditor-pattern-spec.md` §"Versioning." **Production adopters:** pin to the commit hash you adopted against; v0.x.y is pre-stable, and future minor bumps may add integration requirements.
 
@@ -106,8 +107,10 @@ Versioning policy: `auditor-pattern-spec.md` §"Versioning." **Production adopte
 - **v0.2.x → v0.4.x (complete)** — separate-file architecture, comms layer, watch economy, conformed-version pin semantics. (See CHANGELOG for the per-release detail.)
 - **v0.5.0** — the reliability layer: §Reliability + the `heartbeat` command surface + `selftest`, Criterion C-23.
 - **v0.5.1** — collapse the activation poll to a uniform low rate (the adaptive split was dead in production).
-- **v0.5.2 (current)** — the per-turn unread hook: a `UserPromptSubmit` backstop surfacing cursor-delta unread every turn, so a busy agent notices mail even when the loop isn't running.
-- **Future / backlog** — `audits_version:` multi-pin map (multi-file rule sources); project-level multi-role corpus sharing; cross-corpus pollination protocol; self-conformance criteria (reserved); the wake-on-arrival hook (waking a *live* session mid-task — the harness boundary the reliability layer leaves open).
+- **v0.5.2** — the per-turn unread hook: a `UserPromptSubmit` backstop surfacing cursor-delta unread every turn, so a busy agent notices mail even when the loop isn't running.
+- **v0.5.3** — the self-healing model/method-pairing recommendation (prefer a distinct model; auto-defer to the most current leading model otherwise; an effort/method asymmetry holds the floor when only one model is available).
+- **v0.5.4 (current)** — `comms-bringup-directive.md`: the ordered, gate-verified comms bring-up procedure; adds the autonomous heads-down wake-on-arrival operationalization (§4b / Gate #7) at the deployment layer.
+- **Future / backlog** — `audits_version:` multi-pin map (multi-file rule sources); project-level multi-role corpus sharing; cross-corpus pollination protocol; self-conformance criteria (reserved); the wake-on-arrival hook (waking a *live* session mid-task — the harness boundary the reliability layer leaves open; `comms-bringup-directive.md` §4b/Gate #7 now *operationalizes and verifies* this at the deployment layer where the host provides an inbox-event primitive, but a host-agnostic spec mechanism remains open).
 - **v1.0.0** — declared once at least two independent projects have run the pattern in production for three months and the spec's evolution has stabilized.
 
 ## License

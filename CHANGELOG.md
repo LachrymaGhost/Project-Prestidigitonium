@@ -2,6 +2,22 @@
 
 All notable changes to Project Prestidigitonium are documented here. Versioning follows semantic versioning per `auditor-pattern-spec.md` §"Versioning."
 
+## [0.5.4] — 2026-06-18
+
+### Origin
+Owner directive after a decorrelated audit pair, running this pattern in production, hit two comms bring-up failures in one engagement: (1) a per-turn unread banner mis-scoped in a shared checkout silently covered only one leg, and (2) a heads-down `/loop` leg relying on a ~20-minute fallback wake with no inbox event-monitor missed mail that arrived in the dead window between fires. Both were operator/bring-up failures, not mechanism defects — the fix is to make the bring-up *prove itself*, including the autonomous-wake path the reliability layer leaves to the harness. Authored by the running auditor; the v2.2 autonomous-wake provisions were drafted by the builder leg and verified decorrelated (refute-default) by the auditor before landing.
+
+### Added
+- **`comms-bringup-directive.md`** — the ordered, idempotent, gate-verified procedure for standing the builder↔auditor comms channel up **correct the first time**, the operational expansion of `adoption-guide.md` Step 9. Five root-cause failure modes (copy-from-instance; no end-to-end gate; shared-checkout scoping; two-party coordination; **no autonomous-wake**), a two-party bring-up sequence, and a **seven-check Mandatory Verification Gate** that proves the channel *delivers, surfaces per-turn, gets read/replied, advances a cursor, AND wakes a heads-down agent* before work begins. Declaring setup "done" on file-existence is the recurring failure; the gate replaces that with proof.
+- **The autonomous-wake operationalization (directive §4b + Gate #7).** The per-turn unread surface (`comms-spec.md` §Activation backstop) fires only on a *submitted turn*; an autonomous/heads-down/loop agent submits none, so its only wake is whatever timer it set, and a long timer alone drops mail into its dead window. §4b directs arming an **event-wake on the agent's own inbox** — the host wake-on-arrival primitive where it exists, `heartbeat wait` where the deployment runs it, a bounded fallback poll behind both — and **Gate #7** proves it actually re-invokes a heads-down agent within bounded latency (not at the next long-timer fire), or records the latency bound explicitly where only the fallback exists. This **operationalizes, at the deployment layer, the wake-on-arrival hook `comms-spec.md` §"does not cover" leaves to the harness** — it adds **no spec mechanism** and no conformance criterion.
+
+### Changed
+- **`README.md`** — front-door synced to v0.5.4: new file-table row for `comms-bringup-directive.md`; Step 9 (How adoption works) references the directive for a correct-first-time bring-up; Status section bumped + a v0.5.4 release-line note; Roadmap notes that the directive's §4b/Gate #7 now operationalizes and verifies the wake-on-arrival hook at the deployment layer (a host-agnostic spec mechanism remains open).
+- **`adoption-guide.md` v0.3.4** — Step 9 references `comms-bringup-directive.md` as the correct-first-time bring-up path (the directive operationalizes Step 9). No step-structure or criteria changes.
+
+### Retained unchanged
+- No conformance-criteria, message-protocol, or spec-mechanism changes. `comms-spec.md`, `auditor-pattern-spec.md`, `conformance-criteria.md`, and `template-auditor-role-file.md` are untouched; all v0.5.x channels and existing instances remain conformant (C-22/C-23 unaffected). The directive is an operational companion that *sequences and verifies* existing provisions; the wake-on-arrival hook it operationalizes remains, as a spec mechanism, explicitly out of `comms-spec.md` (a deployment/harness concern).
+
 ## [0.5.3] — 2026-06-15
 
 ### Origin
