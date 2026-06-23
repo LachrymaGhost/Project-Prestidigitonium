@@ -2,6 +2,21 @@
 
 All notable changes to Project Prestidigitonium are documented here. Versioning follows semantic versioning per `auditor-pattern-spec.md` §"Versioning."
 
+## [0.6.0] — 2026-06-23
+
+### Origin
+A decorrelated builder↔auditor pair running this pattern in production took the comms reliability layer one iteration past v0.5.4's autonomous-wake gate, on the operator directive "make spin-up 100% reliable, no per-spin-up diagnosis." Root insight (the pair's shared-blind-spot pass): **liveness-by-age proves the WATCH alive, not the agent-waking WAKE armed** — `heartbeat up` brings the watch up without arming the wake (the *up ≠ armed* seam), and the heartbeat goes GREEN regardless of agent state (the *GREEN ≠ listening* gap). v0.5.4's directive even **named** the residual ("an event-wake that quietly died is indistinguishable from no mail") and left re-arming to discipline. This release closes it by mechanism. Built + selftest-proven + verified decorrelated (the auditor ran the production enacting path by hand and confirmed the binding live) before landing — **proven-then-written**.
+
+### Added
+- **`comms-spec.md` v0.6.0 — §Reliability: the wake-marker (armed-listening).** A new liveness mechanism (minor bump per `auditor-pattern-spec.md` §Versioning; **additive under conformed-version-pinning** — a v0.5.x-pinned instance is not retroactively non-conformant; a v0.6.0 *adopter* does provide the new `heartbeat gate` + wake-marker surface). The armed wake stamps a tight-freshness, **session-bound** marker (`<run>/<slug>.wake`) every poll, so **armed-listening ≡ fresh + session-bound** — as falsifiable as liveness. A quietly-died / never-armed / other-session wake reads **`armed=no`** (the named residual, now detectable). New **`heartbeat gate <slug>`** asserts **live + armed + drained** → READY / NOT-READY before "boot complete" (session-scoped; cross-leg readiness uses the freshness-floor). Folded reference-impl hardening: `cb_mark_processed` rejects an empty id (the silent drain no-op); the display cursor labeled lexical-max / display-only (authoritative unread = `cb_unread_count`). Reliability backed by its falsification instrument: `heartbeat selftest` extended to **43 checks** incl. the production enacting path (omitted-arg session binding), the gate's armed-fail path, and the freshness bracket — identical-GREEN.
+- **`comms-bringup-directive.md` v2.3** — armed-listening folded into §4b + the Standing health check: `heartbeat gate` as the continuous (re-runnable) form of the setup-time Gate #7, the per-turn boot-incomplete cue, and a SessionStart auto-bring-up convenience (firing verified-per-deployment, floored by the per-turn surface). Adds no new gate.
+
+### Changed
+- **`README.md`** — front-door synced to v0.6.0 (status + the comms reliability line).
+
+### Retained unchanged
+- The message protocol, `auditor-pattern-spec.md`, and `audit-corpus-spec.md` are untouched. `conformance-criteria.md` **C-23** (comms reliability provisions adopted and proven) already covers the wake-marker under "the reference command surface is present + `heartbeat selftest` reproducibly identical-GREEN" — the new `gate` / wake-marker selftest cases fall under it; **no criteria change**. SessionStart auto-bring-up is a deployment convenience whose firing is verified per-deployment — **not** claimed as a proven spec mechanism; the per-turn `UserPromptSubmit` surface is the proven floor.
+
 ## [0.5.4] — 2026-06-18
 
 ### Origin
