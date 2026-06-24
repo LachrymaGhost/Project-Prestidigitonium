@@ -2,6 +2,20 @@
 
 All notable changes to Project Prestidigitonium are documented here. Versioning follows semantic versioning per `auditor-pattern-spec.md` §"Versioning."
 
+## [0.6.1] — 2026-06-24
+
+### Fixed (errata)
+- **`conformance-criteria.md` v0.3.3 — C-23 de-enumeration (corrects a stale criterion shipped in v0.6.0).** C-23's "what is checked" hardcoded the reference command list (`heartbeat up|wait|wake|down|doctor|status|selftest`), which **omitted the v0.6.0 `heartbeat gate`** and would need hand-syncing on every surface growth. It now points to **the adopted `comms-spec.md` version's command-surface contract**, and its `selftest` conjunct is tied to **exercise that adopted surface in full** — closing the gap whereby a v0.6.0 adopter could pass C-23 with a gate-less surface and a GREEN `selftest` that never exercised `gate`. A command from the adopted surface that is absent **or present-but-unexercised** is now an explicit Failure condition (previously C-23 failed on no missing command at all). One-home-per-rule restored: the surface lives once in `comms-spec.md`; C-23 points, it does not copy — retiring the drift surface itself (per the `references:` pin-free [0.2.6] and conformed-version [C-1] precedents).
+- **Errata to the v0.6.0 "no criteria change" claim.** The v0.6.0 "Retained unchanged" note asserted C-23 "already covers" the wake-marker/`gate` with "no criteria change." That was an **overclaim**: C-23 required the `selftest` GREEN, not that it *exercise* `gate`, so a gate-less v0.6.0 adopter could pass — coverage the criterion text did not guarantee. v0.6.1 makes the coverage real. The v0.6.0 *mechanism* (the wake-marker + `gate`) was correct and is unchanged; only the **conformance criterion** that should have gated it is fixed here.
+- **Backward-conformance preserved (conformed-version semantics, C-1).** A v0.5.x-§Reliability adopter's "adopted version's surface" is v0.5.x — it owes no `gate`; only v0.6.0+ adopters do. No existing instance is retroactively non-conformant; C-23 remains **Recommended**; no Required criterion changed.
+
+### Changed
+- **`README.md`** — Status/Roadmap synced to v0.6.1 (the C-23 errata line).
+- **`adoption-guide.md` v0.3.4 → 0.3.5 (Step 6) + `template-auditor-role-file.md` v0.3.6 → 0.3.7** — the example `follows_pattern:` pins advance v0.5.0 → v0.6.1: v0.6.1 is the release where the comms-reliability command surface becomes a **conformed** surface (C-23 v0.3.3 now requires it), so the example pin advances per the conformed-surface-moved pin semantics (C-1) — *not* tracks-latest (v0.6.0, where the mechanism merely appeared with no criterion requiring it, is skipped). The same lockstep applied when comms duties moved at v0.5.0; each file bumps its own version + provenance.
+
+### Origin
+A **cross-project decorrelation catch.** While a sibling project's decorrelated auditor reviewed its own plan to adopt PP v0.6.0, it read C-23, could not find `gate`, and routed the gap "upstream to PP." The pattern's own builder↔auditor pair then reproduced and verified it refute-default before this errata — decorrelation operating at the ecosystem level: one project's auditor catching a published gap another pair missed at release. (Method note: the v0.6.0 "no criteria change" line is preserved verbatim in its original [0.6.0] entry and corrected here as dated errata — not rewritten in place — per the [0.2.3] errata precedent, so the record of the claim stays auditable.)
+
 ## [0.6.0] — 2026-06-23
 
 ### Origin
