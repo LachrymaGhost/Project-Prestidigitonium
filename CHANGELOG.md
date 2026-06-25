@@ -2,6 +2,22 @@
 
 All notable changes to Project Prestidigitonium are documented here. Versioning follows semantic versioning per `auditor-pattern-spec.md` §"Versioning."
 
+## [0.6.2] — 2026-06-25
+
+### Origin
+A **four-frame cross-implementation triangulation** of the v0.6.0 armed-listening feature — this leg's builder↔auditor pair, an external decorrelated aire pair, and a sibling DT-pair auditor, judged against the spec text + three independent v0.6.0 builds — found the armed-listening under-pinned the **session-id source** and its **absent** behaviour; and a parallel watcher-bug investigation found a `/compact`-orphaned waiter **masks `armed`** (it shares the preserved session id and passes the live-task check). "The reference impl is immune" was itself **refuted** — it shared the fail-open class. Decorrelation at the ecosystem level: three independent frames converging on one spec gap.
+
+### Changed
+- **`comms-spec.md` v0.6.0 → v0.6.2 — §Armed-listening hardened** (a tightening of v0.6.0's armed-listening; v0.5.x untouched). (1) own-session armed MUST **fail-CLOSED** on an absent/empty session source — never a freshness-only or process-liveness floor (the silent-degrade named as the anti-pattern); (2) the session-id source **pinned by property** (guaranteed-present, changes-on-new-session, harness-provided), explicitly **not named** in the spec; (3) two binding-blind boundaries named — a context compaction preserves the id, a sub-agent shares its parent's id; (4) the **live-task check promoted from prose discipline to a coded provision** (the marker carries the wake's pid; armed requires that process alive — GP2 / enforce-by-mechanism); (5) the cross-leg readiness path made **explicit / opt-in** (`--cross-leg` freshness-floor), never the silent own-session fallback; (6) a **single-waiter identity (singleton) provision** — the live-task check is necessary-but-NOT-sufficient: a context-reset-orphaned waiter passes liveness yet masks `armed`, so the wake must be a per-slug singleton that retires the orphan on arm; (7) §falsifiable-property gains absent-source→fail-closed, dead-wake→armed=no, and a **duplicate/orphan-waiter injection**.
+- **`comms-bringup-directive.md` v2.3 → v2.4** — the `heartbeat gate`/`doctor` **version-skew conditional** (`gate` is a v0.6.0+ command; a pre-armed-listening `bin/` uses `doctor`), stated by pointing to the adopted version (no surface re-enumeration, per C-23's de-enumeration) + reflects the v0.6.2 hardening. No new gate; Gate #7's proof unchanged.
+- **`conformance-criteria.md` v0.3.3 → v0.3.4 — C-23 failure-mode conjunct.** v0.3.3 closed the command-surface gap; this closes it one level down — C-23 is command-surface-keyed, so a happy-path `selftest` could pass while omitting the new behaviour cases. C-23 now ALSO requires the suite **inject each failure mode the adopted `comms-spec.md` §falsifiable-property enumerates** — by pointing to that section, not copying (self-updating: the orphan-waiter injection is auto-covered). Backward-conformance preserved by C-1; C-23 stays Recommended.
+
+### Reference implementation (the Aire deployment — built + proven, not part of the spec)
+`comms-lib.sh` / `comms-wait` / `comms-doctor` implement the above: the singleton-claim (exact-arg `/proc/cmdline` reap) + EXIT-trap (both **PID-guarded** so a reaped orphan can't clobber the current waiter) + the live-task check + fail-closed; the wake-marker carries the stamping waiter's pid. `heartbeat selftest` is **identical-GREEN 50/0 across N runs** incl. the orphan-injection. Decorrelated-auditor-GREEN before landing (proven-then-written).
+
+### Retained unchanged
+`auditor-pattern-spec.md`, `audit-corpus-spec.md`, the message protocol, and the **auditor-role-file conformance surface (C-1..C-17)** are untouched — so existing auditor-role-file `follows_pattern:` pins (v0.6.1) stay conformant: this release moves the **comms-reliability** surface only, and per C-1's conformed-version semantics a pin older than HEAD is conformant when no conformed surface it depends on moved (no re-pin treadmill).
+
 ## [0.6.1] — 2026-06-24
 
 ### Fixed (errata)
