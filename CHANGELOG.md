@@ -2,6 +2,37 @@
 
 All notable changes to Project Prestidigitonium are documented here. Versioning follows semantic versioning per `auditor-pattern-spec.md` §"Versioning."
 
+## [0.7.1] — 2026-07-16
+
+### Origin
+The **3-party stability triangulation** that followed v0.7.0 (builder + Claude auditor + cross-vendor Gemini auditor asking "are we ready for real work?") surfaced that the freshly-canonized §Peer reconciliation was **silent on safety-class splits**. Both auditors found it **independently** — the Fable auditor as note N2 ("fail-toward-escalation should explicitly outrank debate-first there — one clause closes it") and the Gemini cross-vendor auditor concurrently ("a safety-split exception needs to be added to the peer-discipline canon"). A convergent cross-vendor finding, not a single leg's — the discipline caught a gap in its own genesis.
+
+### Added
+- **`auditor-pattern-spec.md` v0.4.0 → v0.4.1 — safety-class carve-out in §Peer reconciliation point (2).** A split turning on a **safety / security / legality / irreversible-harm** boundary **fails toward escalation**: it is surfaced to the user *immediately* and the debate proceeds *in parallel* rather than as a precondition. The rationale is explicit — debate-first trades latency for the decorrelation dividend, sound only while the cost of a slow resolution is **bounded**; a safety-class split's is not (the harm can land while the legs negotiate), so the polarity inverts. An **explicit exception to the timing of (2) and (3) only** (the surfacing precedes the debate); disciplines **(4) never-averaged** and **(5) losing-position-as-corpus** are unchanged. Includes the conservative default: an ambiguous-class split is **treated as safety-class** — over-escalation costs only attention, under-escalation can cost the harm the discipline exists to prevent.
+
+### Retained unchanged
+The comms/reliability surface, the message protocol, and the **auditor-role-file conformance surface (C-1..C-23)** are untouched. This release is **additive** — it narrows point (2) for one class of split and invalidates no existing adoption (a single-auditor adoption has no peer). Existing `follows_pattern:` pins stay conformant.
+
+### Verification
+Authored by the aire RoleSmith (aire-smith, Opus 4.8). An inline **test simulation** passed before landing (per the aire test-simulation gate): the carve-out closes the harm-during-negotiation gap, introduces no debate-first regression for ordinary verdict splits (the safety class is enumerated, not "any high-stakes split"), and is coherent with the integrity floor and point-3 timing. **Delta-verified by peer-triangulation** — the Claude auditor (Fable 5) and the Gemini cross-vendor auditor derive independently; owner adopts. Committed to a LachrymaGhost/Project-Prestidigitonium branch after adoption, never mr-kelley.
+
+## [0.7.0] — 2026-07-16
+
+### Origin
+Running an adoption with **two decorrelated auditors** (the aire cross-vendor triangle: builder + a Claude auditor + a cross-vendor Gemini auditor) surfaced that the pattern named *peer-triangulation* as a meta-audit surface but never said **how two decorrelated legs reconcile a disagreement**. The rule lived only in one deployment's memory + correspondence + a single auditor seat's cross-rule — not in canon. The aire owner ruled it (2026-07-16): *"settle it through debate and negotiation, then triangulate the best pathway forward and see inspiration wherever it comes from… it's ok for all of us to be wrong — being wrong helps us understand what not to do."*
+
+### Added
+- **`auditor-pattern-spec.md` v0.3.0 → v0.4.0 — new `## Peer reconciliation (multiple decorrelated legs)`.** The owning statement for how decorrelated legs handle a **split**: (1) independent derivation first (Mechanism 4); (2) **debate → negotiate → triangulate, not immediate escalation**; (3) an unresolved split surfaced to the user **decision-shaped, both positions preserved**; (4) **never averaged / voted / auto-reconciled** — a CONFORMANT-vs-REFUTED split is the **decorrelation prize**, not noise (the integrity floor); (5) a losing position retained as **corpus** (Mechanism 2 — being wrong teaches). Applies to auditor↔auditor peer-triangulation **and** builder↔auditor forks; the user stays authoritative (precedence level 1). The *does-NOT-solve* peer-triangulation line now points to it.
+
+### Retained unchanged
+The comms/reliability surface, the message protocol, and the **auditor-role-file conformance surface (C-1..C-23)** are untouched — this release is **additive** (a single-auditor adoption has no peer, so none is invalidated). Existing `follows_pattern:` pins stay conformant (C-1 conformed-version semantics; no re-pin treadmill).
+
+### Forward
+A **multi-auditor concurrency + verdict-reconciliation spec** (scheduling, verdict collection, reconciliation records) and a matching conformance criterion elaborate this section — named, not yet built.
+
+### Verification
+Authored by the aire RoleSmith (aire-smith, Opus 4.8). **Verified by peer-triangulation on the reconciliation rule itself** — the Claude auditor (Fable 5) and the Gemini cross-vendor auditor derive independently; owner adopts. Committed to a LachrymaGhost/Project-Prestidigitonium branch after adoption, never mr-kelley.
+
 ## [0.6.2] — 2026-06-25
 
 ### Origin
