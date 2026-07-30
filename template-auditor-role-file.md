@@ -1,6 +1,6 @@
 ---
 name: template-auditor-role-file
-version: 0.3.7
+version: 0.3.8
 status: draft
 license: Apache-2.0
 maintained_by: Aire System Architect (ASA)
@@ -32,7 +32,35 @@ audits: <audited-role-slug>.role.md
 audits_version: <the audited role file's version the interpretations below were authored against>
 follows_pattern: Project Prestidigitonium v0.6.1
 audit_posture: <one of: artifact-verdict-only | continuous-monitoring | hybrid>
+
+# Coverage binding (per the host framework's coverage spec, where one exists)
+coverage_model: <none | advisory | artifact | code>
+coverage_config:
+  justification: <why — an auditor usually produces verdicts, not spec-governed implementation units>
+
+# Governance versions this auditor operates under (one entry per artifact this file BINDS)
+governance:
+  <governance-artifact>: <version>
 ---
+
+**On the `governance:` block (added v0.3.8).** List **every** governance artifact this auditor
+*binds* — anything named in a Normative Requirement, an Operational Constraint, or an **Inputs**
+entry as something the auditor operates under — with the version it was authored against.
+**Binding makes a rule apply; pinning makes its drift detectable.** They are separate mechanisms and
+are easy to mistake for one: an auditor that obeys a spec it never pinned is running on a rule
+nothing is watching, and will keep obeying the stale version silently after that spec moves. This is
+the same failure `audits_version:` prevents on the *audited role's* axis — one axis over, on the
+auditor's own governance.
+
+**A pin block nobody reads is a plaque.** The block is only half the mechanism; the other half is
+the **comparison**. State in this file's staleness-check clause that the auditor, at session start,
+compares each pinned version against the live artifact and treats a mismatch as a reportable
+finding — the same load-time detection `audits_version:` gives you. A version-agnostic **whole-block**
+sweep is the right instrument; a search for one specific version can only find files pinned at the
+value being replaced and is blind by construction to every file pinned older.
+
+The key name `governance:` is the Aire-shaped example, not a mandate — a host framework with a
+different frontmatter convention satisfies this by recording the same facts in its own shape.
 
 # Purpose
 

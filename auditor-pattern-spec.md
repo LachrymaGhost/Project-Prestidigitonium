@@ -1,6 +1,6 @@
 ---
 name: auditor-pattern-spec
-version: 0.3.0
+version: 0.3.1
 status: draft
 license: Apache-2.0
 maintained_by: Aire System Architect (ASA)
@@ -135,6 +135,35 @@ Three-level precedence:
 
 The asymmetric corpus does not supersede upstream governance; it supplements it with documented failure patterns. Corpus entries that conflict with current governance are flagged as **superseded** rather than overriding.
 
+## Governance drift on the auditor's own axis
+
+The pattern already guards one drift axis: the **audited role** can bump its version, revise its
+checks, and slide out from under the auditor's interpretations — which is why the auditor declares
+`audits_version:` and compares it at load time.
+
+**The auditor's own governance drifts the same way, and for a long time nothing watched it.** An
+auditor binds upstream governance — the base role template, the spec-authoring spec, diagnostics,
+documentation, whatever the host framework supplies — and those artifacts move. An auditor that
+obeys a spec it never pinned is running on a rule nothing is watching, and will keep obeying the
+stale version silently after that spec changes.
+
+**The mechanism is two halves, and neither works alone:**
+
+1. **Pin** — the auditor file records, in machine-readable frontmatter, the version of every
+   governance artifact it *binds*. Binding makes a rule apply; pinning makes its drift *detectable*.
+2. **Compare** — the auditor's staleness check reads those pins against the live artifacts at
+   session start and reports mismatches. **A pin block nobody reads is a plaque.** Detection is the
+   product of the record and the reader; a record alone is absence-read-as-compliance one level up.
+
+A **version-agnostic whole-block** sweep is the correct instrument. Searching for one specific
+version can only find files pinned at the value being replaced, and is blind by construction to
+every file pinned older — a real failure mode, not a hypothetical: it once left four stale pins
+undetected on a single file while the sweep reported success.
+
+Conformance is verified at **C-24**; the frontmatter skeleton and its guidance live in
+`template-auditor-role-file.md`. This section is the owning statement — the criteria point here
+rather than carrying the rule themselves.
+
 ## File-relationship topology
 
 In the separate-file architecture, three files (and one optional directory) are in play for each adoption:
@@ -211,3 +240,4 @@ Update version and provenance on every change.
 - source: Architectural revision of v0.1.x.
 - time: 2026-06-07
 - summary: v0.2.0 — Inverts the architectural commitment from same-file (audit lens as `# §Audit-Variant` section in the audited role's file) to separate-file (auditor lives in `<audited-role>-auditor.role.md`, with the audited role file declared as an Input via reciprocal `audits:` / `audited_by:` frontmatter pointers). Reasoning: same-file preserved domain fluency at the cost of shared source text — the auditor reading the same words could not catch what those words did not say. Mechanism-level mitigations (asymmetric corpus, adversarial frame, independent re-derivation) addressed the symptom; separate-file addresses the structural cause. The four mechanisms survive the inversion: encompassment scope becomes structurally explicit (audited role declared as input), asymmetric corpus access discipline shifts to loaded by the auditor file alone, adversarial default and independent re-derivation remain unchanged. Integration requirements rewritten around the separate-file topology. Naming convention introduced: filename `<audited-role-slug>-auditor.role.md`; display name `<Project> <Role> Auditor`. v0.1.x implementations remain documented at archive branch `archive/v0.1.x-same-file-architecture`; not invalidated but no longer the canonical direction. Breaking revision under the 0.x convention (the README's v0.1.x roadmap warned minor bumps may invalidate existing implementations during the pre-stable phase). v0.2.1 (2026-06-07) — Adds explicit supersession of v0.1.x architectural language (quoting the v0.1.x template's "no separate file" note and stating its reversal under v0.2.0+) per Sketch Main Auditor's observation that the confident v0.1.x "no" could mislead adopters pinned to v0.1.1. Adds the "asymmetry shifted from declarative to structural" framing — load-discipline reminder replaced by file-system gate — articulating the load-bearing reason the architectural inversion is an improvement rather than just a reorganization. Editorial clarification; no integration-requirement changes from v0.2.0. v0.2.2 (2026-06-07) — Per Sketch Main Auditor's v0.2.0 review (E5): corrects the semver-language contradiction where the spec defined Major as `x+1.0.0` yet labeled 0.1.1→0.2.0 a "major architectural revision" and "major version bump." Defensible under 0.x convention (the README's v0.1.x roadmap explicitly warned that minor bumps may invalidate existing implementations during pre-stable), but the labels contradicted the scheme. Wording corrected to "breaking revision under the 0.x convention" in both the Versioning section and the v0.2.0 provenance entry. No structural changes. v0.2.6 (2026-06-11) — Same-file (v0.1.x) architecture retired entirely by owner decision, on first-operational-day evidence from running instances: a separate-file auditor caught its own author reproducing, in a second auditor file, the exact defect class the author had fixed in the first the same day — the correlated-blind-spot thesis demonstrated on the pattern's designer. The archive branch is removed (content survives in git history); all stay-on-v0.1.x language scrubbed; the migration section in the adoption guide is retained as the path for remaining same-file deployments. Retirement is a support-status change, not a stability claim: the v1.0.0 gate is unchanged. v0.3.0 (2026-06-11) — Comms layer added to the pattern: `.comms/` row in the file-relationship topology per the new `comms-spec.md` (builder↔auditor mail; auditor-owned setup via the activation-directive bootstrap; auditor-owned self-triggering housekeeping; mail-is-not-corpus boundary). Version lockstep at 0.3.0.
+- summary: v0.3.1 (2026-07-30) — **New §"Governance drift on the auditor's own axis" — the owning statement for auditor-side governance pinning.** The pattern guarded the audited role's drift (`audits_version:` + load-time compare) and never the auditor's own: an auditor binds upstream governance that moves, and nothing detected it. States the mechanism as **two halves — pin AND compare** — because a pin block nobody reads is a plaque, and names the version-agnostic whole-block sweep as the instrument (a specific-version search is blind by construction to every file pinned older; it once hid four stale pins on one file while reporting success). Added here rather than inside the criterion because a criterion carrying a rule alone is the shape `conformance-criteria.md` v0.3.3's de-enumeration retired — criteria point at owning statements. Verified at **C-24** (Recommended, v0.3.5); skeleton + guidance in `template-auditor-role-file.md` v0.3.8. Drafted by an Aire RoleSmith builder, refuted by its decorrelated auditor (four folds accepted), owner-authorized. No mechanism changed for existing adopters; prior-conformant implementations remain conformant.

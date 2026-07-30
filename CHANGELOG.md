@@ -2,6 +2,27 @@
 
 All notable changes to Project Prestidigitonium are documented here. Versioning follows semantic versioning per `auditor-pattern-spec.md` §"Versioning."
 
+## [0.6.3] — 2026-07-30
+
+### Origin
+An operator-run diagnostic in an **un-roled session** of an Aire deployment — no role file loaded, reaching the diagnostics methodology only through a pointer skill — ran an omission analysis and found an auditor seat **binding nine governance specs while pinning none of them**. Both halves of that project's decorrelated pair had missed it all night, including in a stroke that ran the same completeness sweep across the builder's own file. Measured across that estate: **every builder role carried a governance pin block; three of four auditor seats did not** — and one seat's provenance recorded its block as *"deliberately deferred to match the in-repo conformant instance"*, i.e. **peer-mimicry, documented in the act**. The omission is structural to this pattern, so every adopter inherits it.
+
+**The gap was caused by an enumeration, not by an omission of intent.** C-3 (Required) says the auditor file "follows base role template structure" and the template body points at a host base template — but C-3's check enumerates **sections**, and C-1, the only criterion that parses frontmatter, enumerates exactly `audits:` and `follows_pattern:`. The pointer was real and the inheritance broke anyway, because **the enumeration governs, not the pointer.**
+
+### Added
+- **`auditor-pattern-spec.md` v0.3.0 → v0.3.1 — §"Governance drift on the auditor's own axis"** (the owning statement). The pattern guarded the *audited role's* drift via `audits_version:` + load-time compare, and never the governance the **auditor itself** operates under. States the mechanism as **two halves — pin AND compare** — and names the **version-agnostic whole-block sweep** as the instrument.
+- **`conformance-criteria.md` v0.3.4 → v0.3.5 — Criterion C-24 (Recommended)**: the governance the auditor operates under is **pinned, and compared**. Three conjuncts — presence · completeness over Normative-Requirement/Operational-Constraint/**Inputs** bindings · **currency comparison at session start**. The third is load-bearing: **a pin block that is present, complete, and never compared is a plaque** — the record without the reader. Mirrors C-21's engineering, whose value was never the field but the load-time comparison it enables. Era-conditioned (pre-adopters are **WORK**, never retroactive FAIL) with the jaw that **absence is reportable on sight, never silence**. **Event-shaped revisit trigger: promotion-to-Required reviewed at the next MAJOR**, so Recommended cannot become permanent by default.
+
+### Changed
+- **`template-auditor-role-file.md` v0.3.7 → v0.3.8** — frontmatter gains the coverage binding and the `governance:` skeleton, **plus the staleness-comparison guidance**. The comparison half rides the template deliberately: the template *is* the propagation vector the origin data measured, and a template that propagates the record without the reader propagates the plaque.
+- **`conformance-criteria.md` — C-1 and C-3 each gain a one-line non-exhaustiveness cross-ref to C-24.** Both, not one: C-1's two-field list is the enumeration that *caused* the miss, so annotating C-3 alone would leave the next tool built from C-1 re-inheriting the gap with the note sitting one criterion over.
+
+### Method
+Drafted by an Aire RoleSmith builder and **refuted by its decorrelated auditor before reaching the owner** — the finding lands on that auditor's own seat and the pattern it follows, so self-interest was declared on both sides and the refutation was solicited precisely where agreement would have been cheapest. Four folds accepted, none negotiated down; the HIGH one added C-24's comparison conjunct, without which this release would have **exported upstream the exact defect the originating session spent the night curing downstream**. Owner-authorized.
+
+### Retained unchanged
+`audit-corpus-spec.md`, `comms-spec.md`, `comms-bringup-directive.md`, the message protocol, and **every Required criterion (C-1..C-17)** are untouched. C-24 is Recommended and the C-1/C-3 additions are non-normative cross-refs, so per C-1's conformed-version semantics existing `follows_pattern:` pins stay conformant — **no re-pin treadmill**.
+
 ## [0.6.2] — 2026-06-25
 
 ### Origin
